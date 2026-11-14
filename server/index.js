@@ -13,6 +13,7 @@ import * as A from './views/account.js';
 import * as B from './views/admin.js';
 import { shopCategories, SITE } from './views/layout.js';
 import { paymentsEnabled } from './payments.js';
+import * as PL from './planning.js';
 import { normSlug, importAll } from './import.js';
 
 // .env inlezen (simpel, zonder extra pakket)
@@ -89,6 +90,8 @@ app.post('/contact', (req, res) => {
   res.redirect(303, '/contact?verzonden=1');
 });
 app.get('/showroom', (req, res) => send(res, P.showroom(req)));
+app.get('/projecten', (req, res) => send(res, P.projecten(req)));
+app.get('/over-fuente', (req, res) => send(res, P.overFuente(req)));
 app.get('/journaal', (req, res) => send(res, P.journaal(req)));
 app.get('/journaal/:slug', (req, res) => {
   const a = P.ARTICLES.find(x => x.slug === req.params.slug);
@@ -96,15 +99,25 @@ app.get('/journaal/:slug', (req, res) => {
   send(res, P.artikel(req, a));
 });
 app.get('/afspraak', (req, res) => send(res, P.afspraak(req, { sent: req.query.verzonden === '1' })));
+app.get('/afspraak/tijden', (req, res) => {
+  res.set('Cache-Control', 'no-store').json({ tijden: PL.slots(clean(req.query.met, 20), +req.query.duur, clean(req.query.datum, 10)) });
+});
 app.post('/afspraak', (req, res) => {
   const b = req.body, errors = {};
   if (b.website) return res.redirect(303, '/afspraak?verzonden=1'); // spam
+  const met = clean(b.met, 20), duur = +b.duur, datum = clean(b.datum, 10), tijd = clean(b.tijd, 5);
+  if (!PL.staffById(met)) errors.met = 1;
+  if (!PL.durationByMin(duur)) errors.duur = 1;
+  if (!PL.validDay(datum)) errors.datum = 1;
+  if (!errors.met && !errors.duur && !errors.datum && !PL.slotFree(met, duur, datum, tijd)) errors.tijd = 1;
   if (!clean(b.naam)) errors.naam = 1;
   if (!validEmail(b.email)) errors.email = 1;
   if (Object.keys(errors).length) return send(res, P.afspraak(req, { values: b, errors }), 422);
-  run(`INSERT INTO appointments (name, email, phone, topic, preferred, message, user_id) VALUES (?,?,?,?,?,?,?)`,
-    clean(b.naam, 120), clean(b.email, 160), clean(b.telefoon, 40), clean(b.onderwerp, 60), clean(b.voorkeur, 40), clean(b.bericht, 2000), req.user?.id || null);
-  res.redirect(303, '/afspraak?verzonden=1');
+  const wie = PL.staffById(met).name;
+  run(`INSERT INTO appointments (name, email, phone, topic, preferred, message, user_id, staff, duration, date, time) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+    clean(b.naam, 120), clean(b.email, 160), clean(b.telefoon, 40), clean(b.onderwerp, 60),
+    `${wie} · ${PL.dateLong(datum)} om ${tijd} · ${PL.durationByMin(duur).label}`, clean(b.bericht, 2000), req.user?.id || null, met, duur, datum, tijd);
+  res.redirect(303, `/afspraak?verzonden=1&met=${met}&datum=${datum}&tijd=${encodeURIComponent(tijd)}`);
 });
 app.get('/algemene-voorwaarden', (req, res) => send(res, P.legal(req, one(`SELECT * FROM pages WHERE slug = 'algemene-voorwaarden'`), 'Algemene voorwaarden')));
 app.get(['/privacy', '/privacy-policy'], (req, res) => send(res, P.legal(req, one(`SELECT * FROM pages WHERE slug = 'privacy-policy'`), 'Privacy')));
@@ -454,7 +467,7 @@ app.use('/beheer', adm);
 // ---------- Zoekmachines ----------
 app.get('/robots.txt', (req, res) => res.type('text').send(`User-agent: *\nDisallow: /beheer\nDisallow: /account\nDisallow: /winkelmand\nDisallow: /afrekenen\nDisallow: /bestelling\nSitemap: ${SITE}/sitemap.xml\n`));
 app.get('/sitemap.xml', (req, res) => {
-  const urls = ['/', '/producten', '/diensten', '/showroom', '/journaal', ...P.ARTICLES.map(x => '/journaal/' + x.slug), '/afspraak', '/contact', '/algemene-voorwaarden', '/privacy',
+  const urls = ['/', '/producten', '/diensten', '/showroom', '/over-fuente', '/projecten', '/journaal', ...P.ARTICLES.map(x => '/journaal/' + x.slug), '/afspraak', '/contact', '/algemene-voorwaarden', '/privacy',
     ...shopCategories().map(c => '/producten/' + c.slug), ...P.SERVICES.map(s => '/diensten/' + s.slug),
     ...all('SELECT slug FROM products WHERE visible = 1').map(p => '/product/' + p.slug)];
   res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u => `<url><loc>${SITE}${encodeURI(u)}</loc></url>`).join('')}</urlset>`);

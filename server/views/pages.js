@@ -2,6 +2,7 @@ import { html, raw } from '../lib.js';
 import { layout, pageHead, em } from './layout.js';
 import { productCard } from './shop.js';
 import { ARTICLES, leestijd } from '../journaal.js';
+import * as PL from '../planning.js';
 
 export const REELS = [
   { id: '1758397685579874', title: 'Villa Amsterdam' },
@@ -85,6 +86,14 @@ export const reviewsBlock = () => html`
   </div>
 </section>`;
 
+// Banner: vier staande video's naast elkaar die laten zien wat Studio Fuente doet.
+const HERO = [
+  { src: '/assets/web/clips/villa-45', label: 'Complete woningen' },
+  { src: '/assets/web/hero-kast', label: 'Kasten op maat' },
+  { src: '/assets/web/clips/marmer-45', label: 'Maatwerk in marmer' },
+  { src: '/assets/web/reels/1878561399429307', label: 'Materialen en decors' },
+];
+
 export function home(req, featured) {
   return layout(req, {
     hero: true,
@@ -94,9 +103,14 @@ export function home(req, featured) {
     body: html`
 <section class="hero">
   <div class="hero__media"><img src="/assets/web/hero.webp" alt="De showroom van Studio Fuente met marmeren tegelpanelen en bloesem" width="2048" height="1365"></div>
+  <div class="hero__panels" data-hero-panels>
+    ${HERO.map((h, i) => html`<figure class="hero__panel${i ? '' : ' is-on'}">
+      <video src="${h.src}.mp4" poster="${h.src}.jpg" muted loop playsinline preload="none" data-ambient aria-label="${h.label}"></video>
+      <figcaption><span>0${i + 1}</span>${h.label}</figcaption>
+    </figure>`)}
+  </div>
   <div class="hero__shade"></div>
   <div class="hero__content">
-    <p class="eyebrow eyebrow--light">Interieurshowroom &nbsp;·&nbsp; Amsterdam</p>
     <h1 class="hero__title">Het complete interieur.<br><em>Onder één dak.</em></h1>
   </div>
   <div class="hero__foot">
@@ -120,19 +134,6 @@ export function home(req, featured) {
 </section>
 
 ${reelsBlock()}
-
-<section class="featured">
-  <div class="wrap">
-    <div class="section-head section-head--row">
-      <div>
-        <p class="eyebrow reveal">Uit de winkel</p>
-        <h2 class="reveal">${em('Nieuw in de *collectie*')}</h2>
-      </div>
-      <a class="link-line reveal" href="/producten">Alle producten</a>
-    </div>
-    <div class="grid grid--4">${featured.map(productCard)}</div>
-  </div>
-</section>
 
 ${reviewsBlock()}
 
@@ -242,9 +243,15 @@ const TOPICS = ['Tegels', 'Sanitair', 'Kasten op maat', 'Stalen deuren', 'PVC vl
 
 export function afspraak(req, { values = {}, errors = {}, sent = false } = {}) {
   const v = { naam: req.user ? `${req.user.first_name} ${req.user.last_name}`.trim() : '', email: req.user?.email || '', telefoon: req.user?.phone || '', onderwerp: req.query.onderwerp || '', ...values };
+  const dagen = PL.days();
+  const tijden = PL.slots(v.met, v.duur, v.datum);
+  const wie = PL.staffById(req.query.met), q = req.query;
+  const bevestigd = sent && wie && PL.validDay(q.datum || '') && /^\d{2}:\d{2}$/.test(q.tijd || '');
+  const sel = (a, b) => String(a) === String(b) ? raw(' checked') : '';
+  const fout = Object.keys(errors).length;
   return layout(req, {
     title: 'Afspraak maken',
-    description: 'Plan een showroomafspraak bij Studio Fuente in Amsterdam. Persoonlijk advies over tegels, sanitair, maatwerk en vloeren.',
+    description: 'Plan een showroomafspraak bij Studio Fuente in Amsterdam. Kies met wie, hoelang en wanneer.',
     bodyClass: 'page-afspraak',
     body: html`
 <section class="afspraak">
@@ -257,25 +264,57 @@ export function afspraak(req, { values = {}, errors = {}, sent = false } = {}) {
     ${sent ? html`
       <p class="eyebrow eyebrow--light">Showroomafspraak</p>
       <h1>${em('Dank je wel.\n*Tot snel.*')}</h1>
-      <p class="lead lead--light">We hebben je aanvraag ontvangen en nemen binnen één werkdag contact op om een moment af te spreken.</p>
-      <a class="link-line link-line--light" href="/producten">Kijk alvast in de collectie</a>`
+      ${bevestigd
+        ? html`<p class="lead lead--light">Je aanvraag staat genoteerd voor ${PL.dateLong(q.datum)} om ${q.tijd} met ${wie.name}. We nemen contact met je op om de afspraak te bevestigen.</p>`
+        : html`<p class="lead lead--light">We hebben je aanvraag ontvangen en nemen contact met je op om de afspraak te bevestigen.</p>`}
+      <a class="link-line link-line--light" href="/projecten">Bekijk alvast onze projecten</a>`
     : html`
       <p class="eyebrow eyebrow--light">Showroomafspraak</p>
       <h1>${em('Kom langs.\n*We nemen de tijd.*')}</h1>
-      <form class="form" method="post" action="/afspraak" novalidate>
-        <label><span>Naam</span><input name="naam" value="${v.naam}" required autocomplete="name" class="${errors.naam ? 'is-invalid' : ''}"></label>
-        <label><span>Telefoon</span><input name="telefoon" type="tel" value="${v.telefoon}" autocomplete="tel"></label>
-        <label class="full"><span>E-mail</span><input name="email" type="email" value="${v.email}" required autocomplete="email" class="${errors.email ? 'is-invalid' : ''}"></label>
-        <label><span>Onderwerp</span>
-          <select name="onderwerp">${TOPICS.map(t => html`<option${t === v.onderwerp ? raw(' selected') : ''}>${t}</option>`)}</select>
-        </label>
-        <label><span>Voorkeur</span>
-          <select name="voorkeur">${['Doordeweeks', 'Zaterdag', 'Maakt niet uit'].map(t => html`<option${t === v.voorkeur ? raw(' selected') : ''}>${t}</option>`)}</select>
-        </label>
-        <label class="full"><span>Vertel kort over je project</span><textarea name="bericht" rows="3">${v.bericht || ''}</textarea></label>
-        <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <button type="submit" class="btn btn--light">Afspraak aanvragen</button>
-        ${Object.keys(errors).length ? html`<p class="form__note">Vul je naam en een geldig e-mailadres in.</p>` : ''}
+      <form class="plan" method="post" action="/afspraak" novalidate data-plan>
+        <fieldset class="plan__step">
+          <legend><span>01</span>Met wie wil je een afspraak</legend>
+          <div class="plan__opts plan__opts--2">
+            ${PL.STAFF.map(p => html`<label class="opt"><input type="radio" name="met" value="${p.id}"${sel(v.met, p.id)} required><span><strong>${p.name}</strong></span></label>`)}
+          </div>
+          ${errors.met ? html`<p class="plan__err">Kies met wie je een afspraak wilt.</p>` : ''}
+        </fieldset>
+        <fieldset class="plan__step">
+          <legend><span>02</span>Hoelang heb je nodig</legend>
+          <div class="plan__opts plan__opts--3">
+            ${PL.DURATIONS.map(d => html`<label class="opt"><input type="radio" name="duur" value="${d.min}"${sel(v.duur, d.min)} required><span><strong>${d.label}</strong><small>${d.hint}</small></span></label>`)}
+          </div>
+          ${errors.duur ? html`<p class="plan__err">Kies hoelang de afspraak mag duren.</p>` : ''}
+        </fieldset>
+        <fieldset class="plan__step">
+          <legend><span>03</span>Kies een dag en een tijdstip</legend>
+          <div class="plan__days" data-plan-days>
+            ${dagen.map(d => html`<label class="day"><input type="radio" name="datum" value="${d.date}"${sel(v.datum, d.date)} required><span><small>${d.weekday}</small><strong>${d.day}</strong><small>${d.month}</small></span></label>`)}
+          </div>
+          <div class="plan__times" data-plan-times data-gekozen="${v.tijd || ''}">
+            ${tijden.length
+              ? tijden.map(t => html`<label class="time"><input type="radio" name="tijd" value="${t.time}"${t.free ? sel(v.tijd, t.time) : raw(' disabled')} required><span>${t.time}</span></label>`)
+              : html`<p class="plan__hint">Kies eerst met wie, hoelang en op welke dag. Daarna zie je de vrije tijden.</p>`}
+          </div>
+          ${errors.datum || errors.tijd ? html`<p class="plan__err">Kies een dag en een vrij tijdstip.</p>` : ''}
+        </fieldset>
+        <fieldset class="plan__step">
+          <legend><span>04</span>Jouw gegevens</legend>
+          <div class="form">
+            <label><span>Naam</span><input name="naam" value="${v.naam}" required autocomplete="name" class="${errors.naam ? 'is-invalid' : ''}"></label>
+            <label><span>Telefoon</span><input name="telefoon" type="tel" value="${v.telefoon}" autocomplete="tel"></label>
+            <label class="full"><span>E-mail</span><input name="email" type="email" value="${v.email}" required autocomplete="email" class="${errors.email ? 'is-invalid' : ''}"></label>
+            <label class="full"><span>Onderwerp</span>
+              <select name="onderwerp">${TOPICS.map(t => html`<option${t === v.onderwerp ? raw(' selected') : ''}>${t}</option>`)}</select>
+            </label>
+            <label class="full"><span>Vertel kort over je project</span><textarea name="bericht" rows="3">${v.bericht || ''}</textarea></label>
+            <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+            ${errors.naam || errors.email ? html`<p class="form__note">Vul je naam en een geldig e-mailadres in.</p>` : ''}
+            <p class="plan__summary full" data-plan-summary hidden></p>
+            <button type="submit" class="btn btn--light">Afspraak aanvragen</button>
+            ${fout ? html`<p class="form__note">Nog niet alles is ingevuld. Kijk de stappen hierboven na.</p>` : ''}
+          </div>
+        </fieldset>
       </form>`}
   </div>
 </section>`,
@@ -460,5 +499,79 @@ export function artikel(req, a) {
     <div class="jgrid">${meer.map(journaalCard)}</div>
   </div>
 </section>`,
+  });
+}
+
+// ---------- Projecten en Over Fuente ----------
+const PROJECTS = [
+  { id: '1758397685579874', title: 'Villa Amsterdam', soort: 'Woning' },
+  { id: '1367918648100999', title: 'Villa Landsmeer', soort: 'Woning' },
+  { id: '1595538632588203', title: 'Villa Heerhugowaard', soort: 'Woning' },
+  { id: '926659896508071', title: 'Marmeren wasbakken', soort: 'Maatwerk' },
+  { id: '1079809971403798', title: 'Kast op maat', soort: 'Maatwerk' },
+  { id: '1038959738767519', title: 'Wandpanelen', soort: 'Afwerking' },
+];
+
+export function projecten(req) {
+  return layout(req, {
+    title: 'Projecten',
+    description: 'Projecten van Studio Fuente: villa’s, kasten op maat en maatwerk in marmer. Bekijk recent werk in beeld.',
+    body: html`
+${pageHead('Projecten', em('Van showroom\n*tot oplevering*'), 'Een greep uit recent werk. Van complete woningen tot één stuk maatwerk dat een ruimte afmaakt.')}
+<section class="projecten">
+  <div class="wrap projecten__grid">
+    ${PROJECTS.map((r, i) => html`<figure class="project reveal">
+      <div class="project__media"><video src="/assets/web/reels/${r.id}.mp4" poster="/assets/web/reels/${r.id}.jpg" muted loop playsinline preload="none" data-ambient aria-label="${r.title}"></video></div>
+      <figcaption><span>${String(i + 1).padStart(2, '0')} &nbsp;·&nbsp; ${r.soort}</span><strong>${r.title}</strong></figcaption>
+    </figure>`)}
+  </div>
+</section>
+<section class="jcta">
+  <div class="wrap jcta__inner">
+    <div><p class="eyebrow">Jouw project</p><h2>${em('Begin met\n*een gesprek*')}</h2></div>
+    <div><p class="lead">Vertel ons over je woning en je plannen. In de showroom laten we zien wat er mogelijk is.</p><a class="btn" href="/afspraak">Plan een afspraak</a></div>
+  </div>
+</section>`,
+  });
+}
+
+export function overFuente(req) {
+  return layout(req, {
+    title: 'Over Fuente',
+    description: 'Studio Fuente brengt het complete interieur samen op één adres in Amsterdam: tegels, sanitair, vloeren en maatwerk.',
+    body: html`
+${pageHead('Over Fuente', em('Eén adres voor\n*het hele interieur*'), 'Gekozen met aandacht, geplaatst met zorg.')}
+<figure class="wide reveal-img"><img src="/assets/web/lib/showroom-overzicht.webp" alt="Overzicht van de showroom van Studio Fuente"></figure>
+<section class="over">
+  <div class="wrap over__grid">
+    <h2 class="reveal">${em('Een interieur moet\n*rust uitstralen*')}</h2>
+    <div class="over__text reveal">
+      <p>Daarom brengen wij alles samen op één adres: van de eerste tegel tot de laatste deurgreep. Zodat materialen, kleuren en afwerking op elkaar aansluiten.</p>
+      <p>Wij kiezen materialen op uitstraling én op hoe ze over tien jaar nog zijn. In onze showroom aan de Sierenborch staan de collecties op groot formaat, in daglicht, naast elkaar. Je ziet direct wat bij elkaar past.</p>
+      <a class="link-line" href="/showroom">Bekijk de showroom</a>
+    </div>
+  </div>
+</section>
+<section class="band">
+  <div class="band__media"><video src="/assets/web/clips/villa-45.mp4" poster="/assets/web/clips/villa-45.jpg" muted loop playsinline preload="none" data-ambient aria-label="Villa Amsterdam, opgeleverd door Studio Fuente"></video></div>
+  <div class="band__text">
+    <p class="eyebrow eyebrow--light reveal">Van keuze tot oplevering</p>
+    <h2 class="reveal">${em('Eén plan,\n*één aanspreekpunt*')}</h2>
+    <p class="lead lead--light reveal">Tegels, sanitair, kasten op maat, stalen deuren en vloeren. Wij begeleiden je van de eerste keuze tot de oplevering.</p>
+    <a class="link-line link-line--light reveal" href="/projecten">Bekijk projecten</a>
+  </div>
+</section>
+<section class="werkwijze">
+  <div class="werkwijze__img reveal-img"><img src="/assets/web/showroom-deur.webp" alt="Stalen deur en tegelpresentatie in de showroom" loading="lazy"></div>
+  <div class="werkwijze__body">
+    <p class="eyebrow reveal">Werkwijze</p>
+    <h2 class="reveal">${em('Ontworpen\n*rond jou*')}</h2>
+    <ol class="process">
+      ${STEPS.map(([h, p], i) => html`<li class="reveal"><span>0${i + 1}</span><div><h3>${h}</h3><p>${p}</p></div></li>`)}
+    </ol>
+    <a class="btn reveal" href="/afspraak">Start met een afspraak</a>
+  </div>
+</section>
+${reviewsBlock()}`,
   });
 }

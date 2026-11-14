@@ -55,7 +55,7 @@ ${jsonld ? raw('<script type="application/ld+json">' + JSON.stringify(jsonld).re
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=13">
+<link rel="stylesheet" href="/styles.css?v=17">
 </head>
 <body class="${hero ? 'has-hero' : 'no-hero'} ${bodyClass}">
 
@@ -80,60 +80,20 @@ ${jsonld ? raw('<script type="application/ld+json">' + JSON.stringify(jsonld).re
 <header class="nav${hero ? '' : ' is-solid'}" id="nav">
   <a class="nav__logo" href="/" aria-label="Studio Fuente, naar de homepage"><img src="${LOGO}" alt="Studio Fuente" width="2479" height="417"></a>
   <nav class="nav__links" aria-label="Hoofdmenu">
-    <div class="nav__item" data-mega>
-      <a href="/producten" aria-haspopup="true">Producten</a>
-      <div class="mega">
-        <div class="mega__inner wrap">
-          <div class="mega__col">
-            <form class="mega__search" action="/producten" role="search"><input type="search" name="q" placeholder="Zoek in de collectie" aria-label="Zoek producten"><button aria-label="Zoeken">&rarr;</button></form>
-            <p class="mega__label">Webwinkel</p>
-            <ul class="mega__list">${cats.map(c => html`<li><a href="/producten/${c.slug}">${c.name}<sup>${c.n}</sup></a></li>`)}</ul>
-            <a class="link-line" href="/producten">Alle producten</a>
-          </div>
-          <div class="mega__col">
-            <p class="mega__label">Merken</p>
-            <ul class="mega__small">${subs.map(c => html`<li><a href="/producten/${c.slug}">${c.name}</a></li>`)}${['Muozo', 'Oppio'].map(b => html`<li><a href="/producten/wandpanelen?merk=${b}">${b}</a></li>`)}</ul>
-          </div>
-          <a class="mega__card" href="/producten/wandpanelen"><img src="/assets/web/wandpaneel-ribbel.webp" alt="" loading="lazy"><span>Nieuw</span><strong>Muozo wandpanelen</strong></a>
-          <a class="mega__card" href="/producten/pvc-vloer"><img src="/assets/web/lib/pvc-wand-s.webp" alt="" loading="lazy"><span>Collectie</span><strong>PVC vloeren</strong></a>
-        </div>
-      </div>
-    </div>
-    <div class="nav__item" data-mega>
-      <a href="/diensten" aria-haspopup="true">Diensten</a>
-      <div class="mega">
-        <div class="mega__inner wrap">
-          <div class="mega__col mega__col--wide">
-            <p class="mega__label">Wat we doen</p>
-            <ul class="mega__list mega__list--cols">${SERVICES.map(sv => html`<li><a href="/diensten/${sv.slug}">${sv.name}</a></li>`)}</ul>
-            <a class="link-line" href="/diensten">Alle diensten en werkwijze</a>
-          </div>
-          <a class="mega__card" href="/diensten/kasten-op-maat"><img src="/assets/web/clips/decolegno-45.jpg" alt="" loading="lazy" style="object-position:50% 40%"><span>Maatwerk</span><strong>Kasten op maat</strong></a>
-          <a class="mega__card" href="/afspraak"><img src="/assets/web/lib/showroom-lounge-s.webp" alt="" loading="lazy"><span>Showroom</span><strong>Plan een bezoek</strong></a>
-        </div>
-      </div>
-    </div>
+    <div class="nav__item"><a href="/projecten">Projecten</a></div>
     <div class="nav__item"><a href="/showroom">Showroom</a></div>
-    <div class="nav__item"><a href="/journaal">Journaal</a></div>
-    <div class="nav__item"><a href="/contact">Contact</a></div>
+    <div class="nav__item"><a href="/over-fuente">Over Fuente</a></div>
   </nav>
   <div class="nav__tools">
-    <a class="nav__tool" href="${user ? (user.role === 'beheerder' ? '/beheer' : '/account') : '/account/inloggen'}">${user ? (user.role === 'beheerder' ? 'Beheer' : 'Account') : 'Inloggen'}</a>
-    <a class="nav__tool nav__cart" href="/winkelmand" data-cart-open>Winkelmand <span class="nav__count" data-cart-count>${count}</span></a>
     <a class="nav__cta" href="/afspraak">Afspraak maken</a>
   </div>
   <button class="nav__toggle" aria-label="Menu openen" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
 </header>
 
 <div class="menu" id="menu" hidden>
-  <form class="menu__search" action="/producten" role="search"><input type="search" name="q" placeholder="Zoek in de collectie" aria-label="Zoek producten"><button aria-label="Zoeken">&rarr;</button></form>
-  <a href="/producten">Producten</a>
-  <a href="/diensten">Diensten</a>
+  <a href="/projecten">Projecten</a>
   <a href="/showroom">Showroom</a>
-  <a href="/journaal">Journaal</a>
-  <a href="/contact">Contact</a>
-  <a href="/winkelmand">Winkelmand (<span data-cart-count>${count}</span>)</a>
-  <a href="${user ? '/account' : '/account/inloggen'}">${user ? 'Mijn account' : 'Inloggen'}</a>
+  <a href="/over-fuente">Over Fuente</a>
   <a href="/afspraak" class="menu__cta">Afspraak maken</a>
   <p class="menu__meta">Sierenborch 4, Amsterdam<br><a href="tel:+31203033499">020 303 3499</a></p>
 </div>
@@ -150,11 +110,11 @@ ${msg ? html`<div class="toast is-on" role="status">${msg}</div>` : ''}
     </div>
     <div>
       <h4>Winkel</h4>
-      <p>${cats.slice(0, 4).map(c => html`<a href="/producten/${c.slug}">${c.name}</a><br>`)}<a href="/producten">Alle producten</a></p>
+      <p>${cats.slice(0, 4).map(c => html`<a href="/producten/${c.slug}">${c.name}</a><br>`)}<a href="/producten">Alle producten</a><br><a href="/winkelmand">Winkelmand</a></p>
     </div>
     <div>
       <h4>Studio</h4>
-      <p><a href="/diensten">Diensten</a><br><a href="/showroom">Showroom</a><br><a href="/journaal">Journaal</a><br><a href="/afspraak">Afspraak maken</a><br><a href="/contact">Contact</a><br><a href="/account">Mijn account</a></p>
+      <p><a href="/over-fuente">Over Fuente</a><br><a href="/projecten">Projecten</a><br><a href="/diensten">Diensten</a><br><a href="/showroom">Showroom</a><br><a href="/journaal">Journaal</a><br><a href="/contact">Contact</a><br><a href="/afspraak">Afspraak maken</a><br><a href="/account">Mijn account</a></p>
     </div>
     <div>
       <h4>Contact</h4>
@@ -175,7 +135,7 @@ ${msg ? html`<div class="toast is-on" role="status">${msg}</div>` : ''}
   </div>
 </aside>
 
-<script src="/main.js?v=8" defer></script>
+<script src="/main.js?v=11" defer></script>
 </body>
 </html>`;
 }

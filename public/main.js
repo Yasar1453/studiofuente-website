@@ -304,3 +304,64 @@
   window.addEventListener('resize', fit);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
 })();
+
+/* Banner op telefoon: wissel elke paar seconden naar de volgende video. */
+(function () {
+  var box = document.querySelector('[data-hero-panels]');
+  if (!box) return;
+  var panels = box.querySelectorAll('.hero__panel'), i = 0;
+  setInterval(function () {
+    if (!matchMedia('(max-width: 640px)').matches || document.hidden) return;
+    panels[i].classList.remove('is-on');
+    i = (i + 1) % panels.length;
+    panels[i].classList.add('is-on');
+  }, 6000);
+})();
+
+/* Afspraak plannen: stap voor stap, vrije tijden komen van de server. */
+(function () {
+  var form = document.querySelector('[data-plan]');
+  if (!form) return;
+  var steps = form.querySelectorAll('.plan__step'), times = form.querySelector('[data-plan-times]'), summary = form.querySelector('[data-plan-summary]');
+  var val = function (n) { var el = form.querySelector('input[name="' + n + '"]:checked'); return el ? el.value : ''; };
+  var label = function (n) { var el = form.querySelector('input[name="' + n + '"]:checked'); if (!el) return ''; var t = el.parentNode.querySelector('strong') || el.parentNode.querySelector('span'); return t.textContent.trim(); };
+  var gekozen = times.getAttribute('data-gekozen') || '';
+  function lock() {
+    var met = val('met'), duur = val('duur'), tijd = val('tijd');
+    steps[1].classList.toggle('is-locked', !met);
+    steps[2].classList.toggle('is-locked', !met || !duur);
+    steps[3].classList.toggle('is-locked', !met || !duur || !tijd);
+    if (met && duur && val('datum') && tijd) {
+      var d = new Date(val('datum') + 'T12:00:00');
+      summary.textContent = label('met') + ', ' + d.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' }) + ' om ' + tijd + ' (' + label('duur') + ')';
+      summary.hidden = false;
+    } else summary.hidden = true;
+  }
+  function laad() {
+    var met = val('met'), duur = val('duur'), datum = val('datum');
+    if (!met || !duur || !datum) return lock();
+    fetch('/afspraak/tijden?met=' + met + '&duur=' + duur + '&datum=' + datum, { headers: { Accept: 'application/json' } })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        times.textContent = '';
+        if (!d.tijden.some(function (t) { return t.free; })) {
+          var p = document.createElement('p'); p.className = 'plan__hint'; p.textContent = 'Op deze dag is er geen tijd meer vrij. Kies een andere dag.'; times.appendChild(p);
+        } else d.tijden.forEach(function (t) {
+          var l = document.createElement('label'), i = document.createElement('input'), s = document.createElement('span');
+          l.className = 'time'; i.type = 'radio'; i.name = 'tijd'; i.value = t.time; i.required = true; i.disabled = !t.free;
+          if (t.free && t.time === gekozen) i.checked = true;
+          s.textContent = t.time; l.appendChild(i); l.appendChild(s); times.appendChild(l);
+        });
+        lock();
+      })
+      .catch(function () { lock(); });
+  }
+  form.addEventListener('change', function (e) {
+    var n = e.target.name;
+    if (n === 'tijd') { gekozen = e.target.value; lock(); }
+    else if (n === 'met' || n === 'duur' || n === 'datum') laad();
+  });
+  var dag = form.querySelector('input[name="datum"]:checked');
+  if (dag) dag.parentNode.scrollIntoView({ block: 'nearest', inline: 'center' });
+  lock();
+})();

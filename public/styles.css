@@ -603,7 +603,7 @@ h1 em, h2 em, h3 em { color: var(--bronze); }
 }
 
 /* ---------- Tablet ---------- */
-@media (max-width: 1320px) { .nav__cta { display: none; } }
+
 @media (max-width: 1180px) {
   .nav { grid-template-columns: auto 1fr auto; }
   .nav__links, .nav__cta, .nav__tool:not(.nav__cart) { display: none; }
@@ -806,4 +806,83 @@ h1 em, h2 em, h3 em { color: var(--bronze); }
 @media (max-width: 640px) {
   .jgrid { grid-template-columns: 1fr; }
   .art__kort ol { grid-template-columns: 1fr; }
+}
+
+/* ---------- Projecten en Over Fuente ---------- */
+.projecten { padding-bottom: clamp(80px, 9vw, 130px); }
+.projecten__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(44px, 5vw, 80px) clamp(18px, 2.4vw, 40px); }
+.project { margin: 0; }
+.project__media { aspect-ratio: 4 / 5; overflow: hidden; background: #24211d; }
+.project__media video { width: 100%; height: 100%; object-fit: cover; transition: transform 1.4s var(--ease); }
+.project:hover .project__media video { transform: scale(1.03); }
+.project figcaption { display: grid; gap: 8px; padding-top: 20px; }
+.project figcaption span { font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--stone); }
+.project figcaption strong { font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 2.4vw, 38px); line-height: 1.1; }
+.over { padding: clamp(70px, 8vw, 130px) 0; }
+.over__grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 6vw, 110px); align-items: start; }
+.over__text p { font-size: 19px; line-height: 1.7; color: var(--ink-soft); margin: 0 0 22px; max-width: 54ch; }
+.over__text .link-line { margin-top: 14px; }
+@media (max-width: 1024px) {
+  .projecten__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .over__grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) { .projecten__grid { grid-template-columns: 1fr; } }
+
+/* ---------- Menu: links direct naast de afspraakknop ---------- */
+.nav { grid-template-columns: auto 1fr auto; }
+.nav__links { justify-content: flex-end; }
+
+/* ---------- Banner met video's ---------- */
+.hero__panels { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(4, 1fr); }
+.hero__panel { position: relative; margin: 0; overflow: hidden; background: #1b1916; }
+.hero__panel + .hero__panel { border-left: 1px solid rgba(255, 255, 255, .16); }
+.hero__panel video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero__panel figcaption { position: absolute; z-index: 2; left: clamp(16px, 1.6vw, 28px); top: 112px; font-size: 11px; letter-spacing: .26em; text-transform: uppercase; color: rgba(255, 255, 255, .9); display: flex; gap: 12px; align-items: center; }
+.hero__panel figcaption span { color: rgba(255, 255, 255, .55); }
+.hero__panel:first-child figcaption { left: var(--gutter); }
+.hero__shade { z-index: 1; pointer-events: none; background: linear-gradient(180deg, rgba(14,12,10,.6) 0%, rgba(14,12,10,.12) 26%, rgba(14,12,10,.2) 48%, rgba(14,12,10,.82) 100%); }
+.hero__content, .hero__foot { z-index: 2; }
+@media (max-width: 1024px) { .hero__panels { grid-template-columns: repeat(2, 1fr); } .hero__panel:nth-child(n+3) { display: none; } }
+@media (max-width: 640px) {
+  .hero__panels { grid-template-columns: 1fr; }
+  .hero__panel { display: none; border: 0 !important; }
+  .hero__panel.is-on { display: block; }
+  .hero__panel figcaption { top: 92px; left: var(--gutter); }
+}
+
+/* ---------- Afspraak plannen in stappen ---------- */
+.plan { display: grid; gap: 44px; max-width: 680px; }
+.plan__step { border: 0; margin: 0; padding: 0; min-width: 0; transition: opacity .4s; }
+.plan__step.is-locked { opacity: .32; pointer-events: none; }
+.plan__step legend { padding: 0; margin-bottom: 20px; font-family: var(--serif); font-size: 28px; line-height: 1.15; display: flex; gap: 16px; align-items: baseline; }
+.plan__step legend span { font-family: var(--sans); font-size: 11.5px; letter-spacing: .22em; color: var(--sand); }
+.plan__opts { display: grid; gap: 12px; }
+.plan__opts--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.plan__opts--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.opt, .day, .time { position: relative; display: block; cursor: pointer; }
+.opt input, .day input, .time input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.opt > span, .day > span, .time > span { display: block; border: 1px solid rgba(255, 255, 255, .28); transition: background .3s, border-color .3s, color .3s; }
+.opt > span { padding: 18px 20px; height: 100%; }
+.opt strong { display: block; font-family: var(--serif); font-weight: 400; font-size: 23px; line-height: 1.2; }
+.opt small { display: block; margin-top: 6px; font-size: 13px; line-height: 1.4; color: rgba(255, 255, 255, .6); }
+.opt:hover > span, .day:hover > span, .time:hover > span { border-color: rgba(255, 255, 255, .7); }
+.opt input:checked + span, .day input:checked + span, .time input:checked + span { background: var(--paper); border-color: var(--paper); color: var(--ink); }
+.opt input:checked + span small { color: var(--stone); }
+.opt input:focus-visible + span, .day input:focus-visible + span, .time input:focus-visible + span { outline: 1px solid var(--sand); outline-offset: 3px; }
+.plan__days { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 18px; scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, .3) transparent; }
+.day { flex: 0 0 74px; }
+.day > span { padding: 12px 0 13px; text-align: center; display: grid; gap: 2px; }
+.day small { font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; opacity: .7; }
+.day strong { font-family: var(--serif); font-weight: 400; font-size: 28px; line-height: 1; }
+.plan__times { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 10px; min-height: 48px; }
+.time > span { padding: 12px 0; text-align: center; font-size: 15px; letter-spacing: .04em; }
+.time input:disabled { cursor: not-allowed; }
+.time input:disabled + span { opacity: .28; text-decoration: line-through; border-style: dashed; }
+.plan__hint, .plan__err, .plan__summary { grid-column: 1 / -1; margin: 0; font-size: 14px; color: rgba(255, 255, 255, .6); }
+.plan__err { color: #e3a78b; margin-top: 14px; }
+.plan__summary { font-family: var(--serif); font-size: 22px; line-height: 1.3; color: #fff; padding: 18px 0; border-top: 1px solid rgba(255, 255, 255, .22); border-bottom: 1px solid rgba(255, 255, 255, .22); }
+@media (min-width: 1025px) { .afspraak__img { position: sticky; top: 0; height: 100vh; min-height: 0; align-self: start; } }
+@media (max-width: 560px) {
+  .plan__opts--2, .plan__opts--3 { grid-template-columns: 1fr; }
+  .plan__step legend { font-size: 24px; }
 }

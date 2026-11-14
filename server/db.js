@@ -119,6 +119,8 @@ CREATE INDEX IF NOT EXISTS idx_pc_cat ON product_categories(category_id);
 db.exec(`CREATE TABLE IF NOT EXISTS guest_orders (session_id TEXT NOT NULL, order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE, PRIMARY KEY (session_id, order_id))`);
 // Kleine migraties
 const cols = t => db.prepare(`PRAGMA table_info(${t})`).all().map(c => c.name);
+for (const [c, t] of [['staff', 'TEXT'], ['duration', 'INTEGER'], ['date', 'TEXT'], ['time', 'TEXT']])
+  if (!cols('appointments').includes(c)) db.exec(`ALTER TABLE appointments ADD COLUMN ${c} ${t}`);
 if (!cols('appointments').includes('kind')) db.exec(`ALTER TABLE appointments ADD COLUMN kind TEXT NOT NULL DEFAULT 'afspraak'`);
 
 export const one = (sql, ...a) => db.prepare(sql).get(...a);

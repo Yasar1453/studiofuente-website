@@ -13,7 +13,7 @@ import * as A from './views/account.js';
 import * as B from './views/admin.js';
 import { shopCategories, SITE } from './views/layout.js';
 import { paymentsEnabled } from './payments.js';
-import { normSlug } from './import.js';
+import { normSlug, importAll } from './import.js';
 
 // .env inlezen (simpel, zonder extra pakket)
 const envFile = path.join(ROOT, '.env');
@@ -22,7 +22,7 @@ if (existsSync(envFile)) for (const l of readFileSync(envFile, 'utf8').split('\n
 }
 
 // Eerste start: database vullen
-if (!one('SELECT COUNT(*) n FROM products').n) (await import('./import.js')).importAll();
+if (!one('SELECT COUNT(*) n FROM products').n) importAll();
 
 const app = express();
 app.disable('x-powered-by');
@@ -473,4 +473,6 @@ cleanup();
 setInterval(cleanup, 3600_000).unref();
 
 const PORT = +process.env.PORT || 8765;
-app.listen(PORT, () => console.log(`Studio Fuente draait op http://localhost:${PORT}`));
+// Op Netlify draait de app als functie (netlify/functions/site.mjs) en luistert hij niet zelf.
+if (!process.env.KIJKVERSIE) app.listen(PORT, () => console.log(`Studio Fuente draait op http://localhost:${PORT}`));
+export { app };

@@ -174,6 +174,5 @@ async function downloadImages() {
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   importAll();
-  if (process.argv.includes('--afbeeldingen')) await downloadImages();
-  db.close();
+  (process.argv.includes('--afbeeldingen') ? downloadImages() : Promise.resolve()).then(() => db.close());
 }

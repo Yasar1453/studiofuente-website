@@ -3,7 +3,7 @@ import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+export const ROOT = process.env.APP_ROOT || path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 mkdirSync(path.join(ROOT, 'data'), { recursive: true });
 
 export const db = new DatabaseSync(process.env.DB_PATH || path.join(ROOT, 'data', 'studiofuente.db'));

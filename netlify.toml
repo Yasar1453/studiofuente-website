@@ -1,0 +1,23 @@
+# Kijkversie van de site op Netlify. De echte site draait als Node-server (npm start).
+[build]
+  publish = "public"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "nft"
+  included_files = ["data/kijkversie.db", "server/**"]
+
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/site"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    X-Content-Type-Options = "nosniff"
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

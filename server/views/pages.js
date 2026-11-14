@@ -429,25 +429,29 @@ export function artikel(req, a) {
     body: html`
 <article class="art">
   <header class="art__head wrap">
-    <nav class="crumbs"><a href="/">Home</a><span>/</span><a href="/journaal">Journaal</a><span>/</span><span>${a.topic}</span></nav>
-    <h1>${em(a.title)}</h1>
-    <p class="lead">${a.intro}</p>
-    <p class="jcard__meta"><span>${a.topic}</span><span>${leestijd(a)} min lezen</span></p>
-  </header>
-  <figure class="art__img reveal-img"><img src="${a.img}" alt=""></figure>
-  <div class="wrap art__grid">
-    <aside class="art__side">
-      <p class="eyebrow">In het kort</p>
-      <ul class="svc-points">${a.summary.map(x => html`<li>${x}</li>`)}</ul>
-      ${sv ? html`<a class="link-line" href="/diensten/${sv.slug}">Meer over ${sv.name.toLowerCase()}</a>` : ''}
-    </aside>
-    <div class="art__body">
-      ${a.sections.map(s => html`<section><h2>${s.h}</h2>${(s.p || []).map(x => html`<p>${x}</p>`)}${s.list ? html`<ul>${s.list.map(x => html`<li>${x}</li>`)}</ul>` : ''}</section>`)}
-      <div class="art__end">
-        <p>Twijfel je over wat bij jouw ruimte past? In de showroom kijken we er samen naar.</p>
-        <a class="btn" href="/afspraak?onderwerp=${encodeURIComponent(sv ? sv.name : 'Iets anders')}">Plan een afspraak</a>
-      </div>
+    <div class="art__intro">
+      <nav class="crumbs"><a href="/">Home</a><span>/</span><a href="/journaal">Journaal</a><span>/</span><span>${a.topic}</span></nav>
+      <h1>${em(a.title.replace(': ', ':\n'))}</h1>
+      <p class="lead">${a.intro}</p>
+      <p class="jcard__meta"><span>${a.topic}</span><span>${leestijd(a)} min lezen</span></p>
     </div>
+    <figure class="art__img reveal-img"><img src="${a.img}" alt=""></figure>
+  </header>
+  <section class="art__kort">
+    <div class="wrap">
+      <p class="eyebrow">In het kort</p>
+      <ol>${a.summary.map((x, k) => html`<li><span>0${k + 1}</span><p>${x}</p></li>`)}</ol>
+    </div>
+  </section>
+  <div class="wrap art__body">
+    ${a.sections.map(s => html`<section class="art__row"><h2>${s.h}</h2><div>${(s.p || []).map(x => html`<p>${x}</p>`)}${s.list ? html`<ul>${s.list.map(x => html`<li>${x}</li>`)}</ul>` : ''}</div></section>`)}
+    <section class="art__row art__row--end">
+      <h2>${em('Zelf *zien en voelen*')}</h2>
+      <div>
+        <p>Twijfel je over wat bij jouw ruimte past? In de showroom leggen we de materialen naast elkaar en kijken we er samen naar.</p>
+        <div class="svc-actions"><a class="btn" href="/afspraak?onderwerp=${encodeURIComponent(sv ? sv.name : 'Iets anders')}">Plan een afspraak</a>${sv ? html`<a class="link-line" href="/diensten/${sv.slug}">Meer over ${sv.name.toLowerCase()}</a>` : ''}</div>
+      </div>
+    </section>
   </div>
 </article>
 <section class="journaal journaal--meer">

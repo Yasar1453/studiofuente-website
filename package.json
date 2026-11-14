@@ -1,0 +1,19 @@
+{
+  "name": "studiofuente",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Webwinkel en website van Studio Fuente",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "import": "node server/import.js",
+    "beheerder": "node server/maak-beheerder.js"
+  },
+  "engines": {
+    "node": ">=22.5"
+  },
+  "dependencies": {
+    "express": "^5.3.0"
+  }
+}

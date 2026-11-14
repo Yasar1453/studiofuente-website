@@ -89,6 +89,12 @@ app.post('/contact', (req, res) => {
   res.redirect(303, '/contact?verzonden=1');
 });
 app.get('/showroom', (req, res) => send(res, P.showroom(req)));
+app.get('/journaal', (req, res) => send(res, P.journaal(req)));
+app.get('/journaal/:slug', (req, res) => {
+  const a = P.ARTICLES.find(x => x.slug === req.params.slug);
+  if (!a) return send(res, P.notFound(req), 404);
+  send(res, P.artikel(req, a));
+});
 app.get('/afspraak', (req, res) => send(res, P.afspraak(req, { sent: req.query.verzonden === '1' })));
 app.post('/afspraak', (req, res) => {
   const b = req.body, errors = {};
@@ -448,7 +454,7 @@ app.use('/beheer', adm);
 // ---------- Zoekmachines ----------
 app.get('/robots.txt', (req, res) => res.type('text').send(`User-agent: *\nDisallow: /beheer\nDisallow: /account\nDisallow: /winkelmand\nDisallow: /afrekenen\nDisallow: /bestelling\nSitemap: ${SITE}/sitemap.xml\n`));
 app.get('/sitemap.xml', (req, res) => {
-  const urls = ['/', '/producten', '/diensten', '/showroom', '/afspraak', '/contact', '/algemene-voorwaarden', '/privacy',
+  const urls = ['/', '/producten', '/diensten', '/showroom', '/journaal', ...P.ARTICLES.map(x => '/journaal/' + x.slug), '/afspraak', '/contact', '/algemene-voorwaarden', '/privacy',
     ...shopCategories().map(c => '/producten/' + c.slug), ...P.SERVICES.map(s => '/diensten/' + s.slug),
     ...all('SELECT slug FROM products WHERE visible = 1').map(p => '/product/' + p.slug)];
   res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u => `<url><loc>${SITE}${encodeURI(u)}</loc></url>`).join('')}</urlset>`);

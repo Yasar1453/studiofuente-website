@@ -39,12 +39,43 @@ export function layout(req, { title, description, body, hero = false, bodyClass 
 <meta property="og:url" content="${SITE + req.path}">
 <meta name="theme-color" content="#f7f4ef">
 ${jsonld ? raw('<script type="application/ld+json">' + JSON.stringify(jsonld).replace(/</g, '\\u003c') + '</script>') : ''}
+<style>
+.loader { display: none; }
+.has-loader .loader { display: flex; position: fixed; inset: 0; z-index: 9999; background: #181613; align-items: center; justify-content: center; flex-direction: column; gap: 34px; transition: transform 1.1s cubic-bezier(.7, 0, .2, 1); }
+.has-loader body { overflow: hidden; }
+.loader img { width: min(260px, 58vw); height: auto; filter: invert(1); opacity: 0; transform: translateY(10px); animation: loader-in 1s .15s cubic-bezier(.2, .7, .1, 1) forwards; }
+.loader__line { width: min(260px, 58vw); height: 1px; background: rgba(247, 244, 239, .18); overflow: hidden; }
+.loader__line i { display: block; height: 100%; background: #b89b78; transform: scaleX(0); transform-origin: left; animation: loader-line 1.5s .3s cubic-bezier(.4, 0, .2, 1) forwards; }
+.loader.is-done { transform: translateY(-100%); }
+@keyframes loader-in { to { opacity: 1; transform: none; } }
+@keyframes loader-line { to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .loader, .loader img, .loader__line i { animation-duration: .01s; transition-duration: .3s; } }
+</style>
+<script>try { if (!sessionStorage.getItem('sf-geladen')) document.documentElement.classList.add('has-loader'); } catch (e) {}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=10">
+<link rel="stylesheet" href="/styles.css?v=12">
 </head>
 <body class="${hero ? 'has-hero' : 'no-hero'} ${bodyClass}">
+
+<div class="loader" id="loader" aria-hidden="true"><img src="${LOGO}" alt="" width="2479" height="417"><div class="loader__line"><i></i></div></div>
+<script>(function () {
+  var root = document.documentElement, el = document.getElementById('loader');
+  if (!root.classList.contains('has-loader')) return;
+  var start = Date.now(), klaar = false;
+  function weg() {
+    if (klaar) return; klaar = true;
+    try { sessionStorage.setItem('sf-geladen', '1'); } catch (e) {}
+    setTimeout(function () {
+      el.classList.add('is-done');
+      document.body.style.overflow = 'auto';
+      setTimeout(function () { root.classList.remove('has-loader'); document.body.style.overflow = ''; }, 1200);
+    }, Math.max(0, 1900 - (Date.now() - start)));
+  }
+  window.addEventListener('load', weg);
+  setTimeout(weg, 4000);
+})();</script>
 
 <header class="nav${hero ? '' : ' is-solid'}" id="nav">
   <a class="nav__logo" href="/" aria-label="Studio Fuente, naar de homepage"><img src="${LOGO}" alt="Studio Fuente" width="2479" height="417"></a>
@@ -83,6 +114,7 @@ ${jsonld ? raw('<script type="application/ld+json">' + JSON.stringify(jsonld).re
       </div>
     </div>
     <div class="nav__item"><a href="/showroom">Showroom</a></div>
+    <div class="nav__item"><a href="/journaal">Journaal</a></div>
     <div class="nav__item"><a href="/contact">Contact</a></div>
   </nav>
   <div class="nav__tools">
@@ -98,6 +130,7 @@ ${jsonld ? raw('<script type="application/ld+json">' + JSON.stringify(jsonld).re
   <a href="/producten">Producten</a>
   <a href="/diensten">Diensten</a>
   <a href="/showroom">Showroom</a>
+  <a href="/journaal">Journaal</a>
   <a href="/contact">Contact</a>
   <a href="/winkelmand">Winkelmand (<span data-cart-count>${count}</span>)</a>
   <a href="${user ? '/account' : '/account/inloggen'}">${user ? 'Mijn account' : 'Inloggen'}</a>
@@ -121,7 +154,7 @@ ${msg ? html`<div class="toast is-on" role="status">${msg}</div>` : ''}
     </div>
     <div>
       <h4>Studio</h4>
-      <p><a href="/diensten">Diensten</a><br><a href="/showroom">Showroom</a><br><a href="/afspraak">Afspraak maken</a><br><a href="/contact">Contact</a><br><a href="/account">Mijn account</a></p>
+      <p><a href="/diensten">Diensten</a><br><a href="/showroom">Showroom</a><br><a href="/journaal">Journaal</a><br><a href="/afspraak">Afspraak maken</a><br><a href="/contact">Contact</a><br><a href="/account">Mijn account</a></p>
     </div>
     <div>
       <h4>Contact</h4>

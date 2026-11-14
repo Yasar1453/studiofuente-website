@@ -1,6 +1,7 @@
 import { html, raw } from '../lib.js';
 import { layout, pageHead, em } from './layout.js';
 import { productCard } from './shop.js';
+import { ARTICLES, leestijd } from '../journaal.js';
 
 export const REELS = [
   { id: '1758397685579874', title: 'Villa Amsterdam' },
@@ -373,6 +374,87 @@ ${pageHead('Contact', em('Waar jouw visie\n*begint*'), 'Een vraag over een produ
 </section>
 <section class="map">
   <iframe title="Kaart: Studio Fuente, Sierenborch 4 Amsterdam" src="https://maps.google.com/maps?q=Sierenborch%204%2C%201043%20BA%20Amsterdam&z=15&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+</section>`,
+  });
+}
+
+// ---------- Journaal (kennisartikelen) ----------
+export { ARTICLES };
+const kale = t => t.replace(/\*/g, '');
+const journaalCard = a => html`<a class="jcard reveal" href="/journaal/${a.slug}">
+  <figure class="jcard__img"><img src="${a.img}" alt="" loading="lazy"></figure>
+  <p class="jcard__meta"><span>${a.topic}</span><span>${leestijd(a)} min lezen</span></p>
+  <h3>${em(a.title)}</h3>
+  <p class="jcard__intro">${a.intro}</p>
+</a>`;
+
+export function journaal(req) {
+  const [first, ...rest] = ARTICLES;
+  return layout(req, {
+    title: 'Journaal',
+    description: 'Kennis uit de showroom van Studio Fuente. Over tegels, vloeren en de keuzes die een interieur afmaken.',
+    body: html`
+${pageHead('Journaal', em('Kennis uit\n*de showroom*'), 'Wat we dagelijks in de showroom uitleggen, hier rustig na te lezen. Over materialen, maten en de keuzes die een interieur afmaken.')}
+<section class="journaal">
+  <div class="wrap">
+    <a class="jlead" href="/journaal/${first.slug}">
+      <figure class="jlead__img reveal-img"><img src="${first.img}" alt=""></figure>
+      <div class="jlead__text">
+        <p class="jcard__meta"><span>${first.topic}</span><span>${leestijd(first)} min lezen</span></p>
+        <h2>${em(first.title)}</h2>
+        <p class="lead">${first.intro}</p>
+        <span class="link-line">Lees het artikel</span>
+      </div>
+    </a>
+    <div class="jgrid">${rest.map(journaalCard)}</div>
+  </div>
+</section>
+<section class="jcta">
+  <div class="wrap jcta__inner">
+    <div><p class="eyebrow">Liever persoonlijk advies</p><h2>${em('Kom het\n*zelf bekijken*')}</h2></div>
+    <div><p class="lead">In de showroom leggen we materialen naast elkaar en denken we mee over jouw ruimte.</p><a class="btn" href="/afspraak">Plan een afspraak</a></div>
+  </div>
+</section>`,
+  });
+}
+
+export function artikel(req, a) {
+  const sv = SERVICES.find(x => x.slug === a.service);
+  const meer = ARTICLES.filter(x => x !== a).sort((x, y) => (y.topic === a.topic) - (x.topic === a.topic)).slice(0, 3);
+  return layout(req, {
+    title: kale(a.title),
+    description: a.intro,
+    image: a.img,
+    jsonld: { '@context': 'https://schema.org', '@type': 'Article', headline: kale(a.title), description: a.intro, author: { '@type': 'Organization', name: 'Studio Fuente' }, publisher: { '@type': 'Organization', name: 'Studio Fuente' } },
+    body: html`
+<article class="art">
+  <header class="art__head wrap">
+    <nav class="crumbs"><a href="/">Home</a><span>/</span><a href="/journaal">Journaal</a><span>/</span><span>${a.topic}</span></nav>
+    <h1>${em(a.title)}</h1>
+    <p class="lead">${a.intro}</p>
+    <p class="jcard__meta"><span>${a.topic}</span><span>${leestijd(a)} min lezen</span></p>
+  </header>
+  <figure class="art__img reveal-img"><img src="${a.img}" alt=""></figure>
+  <div class="wrap art__grid">
+    <aside class="art__side">
+      <p class="eyebrow">In het kort</p>
+      <ul class="svc-points">${a.summary.map(x => html`<li>${x}</li>`)}</ul>
+      ${sv ? html`<a class="link-line" href="/diensten/${sv.slug}">Meer over ${sv.name.toLowerCase()}</a>` : ''}
+    </aside>
+    <div class="art__body">
+      ${a.sections.map(s => html`<section><h2>${s.h}</h2>${(s.p || []).map(x => html`<p>${x}</p>`)}${s.list ? html`<ul>${s.list.map(x => html`<li>${x}</li>`)}</ul>` : ''}</section>`)}
+      <div class="art__end">
+        <p>Twijfel je over wat bij jouw ruimte past? In de showroom kijken we er samen naar.</p>
+        <a class="btn" href="/afspraak?onderwerp=${encodeURIComponent(sv ? sv.name : 'Iets anders')}">Plan een afspraak</a>
+      </div>
+    </div>
+  </div>
+</article>
+<section class="journaal journaal--meer">
+  <div class="wrap">
+    <div class="section-head section-head--row"><div><p class="eyebrow">Verder lezen</p><h2>${em('Meer uit het *journaal*')}</h2></div><a class="link-line" href="/journaal">Alle artikelen</a></div>
+    <div class="jgrid">${meer.map(journaalCard)}</div>
+  </div>
 </section>`,
   });
 }

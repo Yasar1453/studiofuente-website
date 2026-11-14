@@ -232,9 +232,15 @@ h1 em, h2 em, h3 em { color: var(--bronze); }
 .visit h2 em { color: #e8dccb; }
 
 /* ---------- Pagina-kop ---------- */
-.page-head { padding: clamp(90px, 11vw, 160px) 0 clamp(50px, 6vw, 90px); }
+.page-head { padding: clamp(44px, 5vw, 72px) 0 clamp(36px, 4vw, 60px); }
 .page-head h1 { font-size: clamp(48px, 7vw, 112px); line-height: .95; margin-bottom: 30px; }
-.wide { margin: 0; height: clamp(360px, 72vh, 820px); overflow: hidden; }
+.wide { margin: 0; height: clamp(200px, var(--rest, 72vh), 820px); overflow: hidden; }
+@media (min-width: 900px) {
+  .page-head .wrap { display: grid; grid-template-columns: max-content minmax(0, 420px); justify-content: space-between; column-gap: 60px; align-items: end; }
+  .page-head .eyebrow, .page-head h1 { grid-column: 1; }
+  .page-head h1 { margin-bottom: 0; }
+  .page-head .lead { grid-column: 2; grid-row: 2; padding-bottom: 10px; }
+}
 .wide img { width: 100%; height: 100%; object-fit: cover; }
 
 /* ---------- Diensten-index ---------- */

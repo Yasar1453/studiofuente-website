@@ -291,3 +291,16 @@
   const acc = $('[data-account]'), pw = $('[data-password]');
   acc?.addEventListener('change', () => { pw.hidden = !acc.checked; });
 })();
+
+/* Brede foto vult precies de rest van het eerste scherm, zodat hij niet half in beeld staat. */
+(function () {
+  var wide = document.querySelector('.page-head + .wide');
+  if (!wide) return;
+  function fit() {
+    var top = wide.getBoundingClientRect().top + window.scrollY;
+    wide.style.setProperty('--rest', Math.round(window.innerHeight - top) + 'px');
+  }
+  fit();
+  window.addEventListener('resize', fit);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+})();

@@ -119,7 +119,7 @@ export const reviewsBlock = (vorm = 'a') => vorm === 'b' ? reviewsCitaat() : vor
 
 // De homepage in drie versies, te kiezen met de balk op de demo (zie layout: versies). Het videoblok is overal gelijk.
 // A: video met titel en tekst, blok Producten en Diensten, recensies als schuivende band.
-// B: video met alleen de regel onderaan, geen blok eronder, één groot citaat dat wisselt.
+// B: video met de regel en twee links onderaan, geen blok eronder, één groot citaat dat wisselt.
 // C: alleen de video, daaronder de vakkenlijst, recensies als wand.
 const BANNERS = { a: 'Video met titel', b: 'Video met regel onderaan', c: 'Alleen video' };
 
@@ -141,10 +141,10 @@ ${v === 'a' ? html`  <div class="hero__content">
   </div>` : html`  <h1 class="sr-only">Studio Fuente, het complete interieur onder één dak</h1>`}
 ${v === 'c' ? '' : html`  <div class="hero__foot">
     <p>Tegels, sanitair, maatwerk en vloeren.<br>Gekozen met aandacht, geplaatst met zorg.</p>
-    ${v === 'a' ? html`<div class="hero__links">
-      <a class="link-line link-line--light" href="/producten">Bekijk de collectie</a>
+    <div class="hero__links">
+      <a class="link-line link-line--light" href="/projecten">Bekijk de projecten</a>
       <a class="link-line link-line--light" href="/afspraak">Plan een bezoek</a>
-    </div>` : ''}
+    </div>
   </div>`}
 </section>
 

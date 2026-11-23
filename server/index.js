@@ -34,6 +34,15 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.static(path.join(ROOT, 'public'), { maxAge: '7d', index: false }));
+// Demo: meerdere versies van een onderdeel naast elkaar. ?versie=b kiest er een, een cookie onthoudt de keuze.
+app.use((req, res, next) => {
+  const q = String(req.query.versie || '').toLowerCase();
+  const c = /(?:^|;\s*)sf-versie=([abc])\b/.exec(req.headers.cookie || '');
+  const gekozen = /^[abc]$/.test(q);
+  req.versie = gekozen ? q : c ? c[1] : 'a';
+  if (gekozen) res.append('Set-Cookie', `sf-versie=${q}; Path=/; Max-Age=2592000; SameSite=Lax`);
+  next();
+});
 app.use(express.urlencoded({ extended: false, limit: '50kb' }));
 app.use(express.json({ limit: '20kb' }));
 app.use((req, res, next) => { req.body ??= {}; next(); });

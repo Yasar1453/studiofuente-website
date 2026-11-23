@@ -890,3 +890,46 @@ h1 em, h2 em, h3 em { color: var(--bronze); }
 
 /* Smalle telefoons: de twee bannerlinks staan onder elkaar, de titel schuift mee omhoog. */
 @media (max-width: 479px) { .hero__content { bottom: 250px; } }
+
+/* Banner zonder tekst: alleen de video, met een lichte schaduw zodat het menu leesbaar blijft. */
+.hero--b .hero__shade { background: linear-gradient(180deg, rgba(14,12,10,.55) 0%, rgba(14,12,10,0) 24%, rgba(14,12,10,0) 78%, rgba(14,12,10,.35) 100%); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Keuzebalk op de demo: wissel tussen versies van een onderdeel. Staat aan de rechterrand, daar staat geen inhoud. */
+.versies { position: fixed; z-index: 60; right: 12px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 5px 5px; background: rgba(24, 22, 19, .92); border: 1px solid rgba(255, 255, 255, .16); border-radius: 999px; color: #f7f4ef; font: 400 11px/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; box-shadow: 0 10px 30px rgba(0, 0, 0, .28); }
+.versies span { color: #a39b8f; font-size: 9px; letter-spacing: .12em; writing-mode: vertical-rl; transform: rotate(180deg); margin-bottom: 6px; }
+.versies a { position: relative; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; color: #cfc8bc; text-decoration: none; }
+.versies a b { font-weight: 500; letter-spacing: 0; font-size: 12px; }
+.versies a i { position: absolute; right: 46px; top: 50%; transform: translateY(-50%); padding: 7px 11px; border-radius: 999px; background: rgba(24, 22, 19, .92); color: #f7f4ef; font-style: normal; letter-spacing: .04em; text-transform: none; font-size: 12.5px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.versies a:hover { color: #fff; }
+.versies a:hover i, .versies a:focus-visible i { opacity: 1; }
+.versies a.is-nu { background: #c9ac8b; color: #181613; }
+@media (max-width: 760px) { .versies { right: 8px; } .versies a { width: 30px; height: 30px; } }
+
+/* Banner B: alleen de twee links onderaan, zonder lijn en tekst. */
+.hero__foot--kaal { border-top: 0; justify-content: flex-end; }
+
+/* Versie C: vakkenlijst. Links een staand beeld dat wisselt, rechts de vakken in grote letters. */
+.vak { display: grid; grid-template-columns: minmax(0, .82fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 110px); align-items: start; max-width: 1560px; margin: 0 auto; padding: clamp(90px, 10vw, 150px) var(--gutter); }
+.vak__beeld { position: sticky; top: 110px; aspect-ratio: 4 / 5; max-height: calc(100vh - 150px); width: 100%; overflow: hidden; background: var(--bone); }
+.vak__beeld img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.05); transition: opacity .7s var(--ease), transform 1.6s var(--ease); }
+.vak__beeld img.is-on { opacity: 1; transform: none; }
+.vak__tel { position: absolute; left: 18px; bottom: 16px; z-index: 2; color: #fff; font-size: 11px; letter-spacing: .22em; text-shadow: 0 1px 12px rgba(0, 0, 0, .5); }
+.vak__tel b { font-weight: 400; }
+.vak__lijst .eyebrow { margin: 0 0 clamp(14px, 2vw, 26px); }
+.vak ol { list-style: none; margin: 0 0 clamp(26px, 3vw, 44px); padding: 0; border-top: 1px solid var(--line); }
+.vak li { display: grid; grid-template-columns: 44px 1fr; align-items: baseline; padding: clamp(11px, 1.35vw, 19px) 0; border-bottom: 1px solid var(--line); cursor: default; outline: 0; color: var(--stone); transition: color .35s, padding-left .5s var(--ease); }
+.vak li > span { font-size: 11px; letter-spacing: .2em; }
+.vak h3 { margin: 0; font: 300 clamp(30px, 3.5vw, 56px)/1.05 var(--serif); letter-spacing: -.01em; color: inherit; }
+.vak li p { margin: 0; max-width: 46ch; color: var(--ink-soft); font-size: 15.5px; line-height: 1.5; max-height: 0; opacity: 0; overflow: hidden; transition: max-height .5s var(--ease), opacity .4s, margin .5s var(--ease); }
+.vak li.is-on { color: var(--ink); padding-left: 14px; }
+.vak li.is-on h3 { font-style: italic; }
+.vak li.is-on p { max-height: 4.6em; opacity: 1; margin-top: 8px; }
+.vak li:focus-visible { box-shadow: inset 2px 0 0 var(--bronze); }
+@media (max-width: 860px) {
+  .vak { grid-template-columns: 1fr; gap: 26px; padding-top: 70px; padding-bottom: 70px; }
+  .vak__beeld { position: relative; top: 0; aspect-ratio: 4 / 3; max-height: none; }
+  .vak li { grid-template-columns: 36px 1fr; }
+}
+@media (max-width: 760px) { .versies { top: 36%; } }
+@media (prefers-reduced-motion: reduce) { .vak__beeld img, .vak li, .vak li p { transition: none; } }

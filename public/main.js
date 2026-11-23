@@ -365,3 +365,18 @@
   if (dag) dag.parentNode.scrollIntoView({ block: 'nearest', inline: 'center' });
   lock();
 })();
+
+/* Vakkenlijst op de homepage (versie C): de rij onder de muis of vinger bepaalt het beeld. */
+(function () {
+  var box = document.querySelector('[data-vak]');
+  if (!box) return;
+  var rijen = box.querySelectorAll('[data-vak-rij]'), beelden = box.querySelectorAll('.vak__beeld img'), nr = box.querySelector('[data-vak-nr]');
+  function kies(i) {
+    rijen.forEach(function (r, j) { r.classList.toggle('is-on', j === i); });
+    beelden.forEach(function (b, j) { b.classList.toggle('is-on', j === i); });
+    if (nr) nr.textContent = '0' + (i + 1);
+  }
+  rijen.forEach(function (r, i) {
+    ['mouseenter', 'focus', 'click'].forEach(function (ev) { r.addEventListener(ev, function () { kies(i); }); });
+  });
+})();

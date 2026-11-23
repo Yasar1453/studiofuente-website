@@ -86,23 +86,40 @@ export const reviewsBlock = () => html`
   </div>
 </section>`;
 
-// Banner: vier staande video's naast elkaar die laten zien wat Studio Fuente doet.
+// Banner in drie versies, te kiezen met de balk op de demo (zie layout: versies).
+// A: één grote video met tekst, daaronder Producten en Diensten. B: alleen de video met twee links, geen blok eronder.
+// C: vier staande video's met tekst alleen onderaan, daaronder de vakkenlijst met wisselend beeld.
+const HERO = [
+  { src: '/assets/web/clips/villa-45', label: 'Complete woningen' },
+  { src: '/assets/web/hero-kast', label: 'Kasten op maat' },
+  { src: '/assets/web/clips/marmer-45', label: 'Maatwerk in marmer' },
+  { src: '/assets/web/reels/1878561399429307', label: 'Materialen en decors' },
+];
+const BANNERS = { a: 'Video met tekst', b: 'Alleen video', c: 'Vier video\'s en vakkenlijst' };
+
 export function home(req, featured) {
+  const v = BANNERS[req.versie] ? req.versie : 'a';
   return layout(req, {
     hero: true,
+    versies: { onderdeel: 'Versie', keuzes: BANNERS, nu: v },
     jsonld: { '@context': 'https://schema.org', '@type': 'HomeAndConstructionBusiness', name: 'Studio Fuente', url: 'https://studiofuente.nl', telephone: '+31203033499', email: 'info@studiofuente.nl',
       address: { '@type': 'PostalAddress', streetAddress: 'Sierenborch 4', postalCode: '1043 BA', addressLocality: 'Amsterdam', addressCountry: 'NL' },
       sameAs: ['https://www.instagram.com/studiofuente/', 'https://www.facebook.com/profile.php?id=61577575230191'] },
     body: html`
-<section class="hero">
+<section class="hero hero--${v}">
   <div class="hero__media"><img src="/assets/web/hero.webp" alt="De showroom van Studio Fuente met marmeren tegelpanelen en bloesem" width="2048" height="1365"></div>
-  <video class="hero__video" src="/assets/web/hero-showroom.mp4" poster="/assets/web/hero-showroom.jpg" muted loop playsinline autoplay preload="metadata" data-ambient aria-label="De materialenwand in de showroom van Studio Fuente"></video>
+${v === 'c' ? html`  <div class="hero__panels" data-hero-panels>
+    ${HERO.map((h, i) => html`<figure class="hero__panel${i ? '' : ' is-on'}">
+      <video src="${h.src}.mp4" poster="${h.src}.jpg" muted loop playsinline preload="none" data-ambient aria-label="${h.label}"></video>
+      <figcaption><span>0${i + 1}</span>${h.label}</figcaption>
+    </figure>`)}
+  </div>` : html`  <video class="hero__video" src="/assets/web/hero-showroom.mp4" poster="/assets/web/hero-showroom.jpg" muted loop playsinline autoplay preload="metadata" data-ambient aria-label="De materialenwand in de showroom van Studio Fuente"></video>`}
   <div class="hero__shade"></div>
-  <div class="hero__content">
+${v === 'a' ? html`  <div class="hero__content">
     <h1 class="hero__title">Het complete interieur.<br><em>Onder één dak.</em></h1>
-  </div>
-  <div class="hero__foot">
-    <p>Tegels, sanitair, maatwerk en vloeren.<br>Gekozen met aandacht, geplaatst met zorg.</p>
+  </div>` : html`  <h1 class="sr-only">Studio Fuente, het complete interieur onder één dak</h1>`}
+  <div class="hero__foot${v === 'b' ? ' hero__foot--kaal' : ''}">
+    ${v === 'b' ? '' : html`<p>Tegels, sanitair, maatwerk en vloeren.<br>Gekozen met aandacht, geplaatst met zorg.</p>`}
     <div class="hero__links">
       <a class="link-line link-line--light" href="/producten">Bekijk de collectie</a>
       <a class="link-line link-line--light" href="/afspraak">Plan een bezoek</a>
@@ -110,7 +127,7 @@ export function home(req, featured) {
   </div>
 </section>
 
-<section class="duo">
+${v === 'a' ? html`<section class="duo">
   <a class="duo__item reveal" href="/producten">
     <div class="duo__img"><video src="/assets/web/clips/decolegno-54.mp4" poster="/assets/web/clips/decolegno-54.jpg" muted loop playsinline preload="none" data-ambient aria-label="Verlichte wand met materiaalstalen"></video></div>
     <div class="duo__text"><p class="eyebrow">Webwinkel</p><h2>Producten</h2><p>Tegels, PVC vloeren en wandpanelen. Direct online te bestellen.</p><span class="link-line">Naar de winkel</span></div>
@@ -119,7 +136,19 @@ export function home(req, featured) {
     <div class="duo__img"><video src="/assets/web/clips/villa-54.mp4" poster="/assets/web/clips/villa-54.jpg" muted loop playsinline preload="none" data-ambient aria-label="Villa Amsterdam"></video></div>
     <div class="duo__text"><p class="eyebrow">Maatwerk</p><h2>Diensten</h2><p>Kasten, stalen deuren, badkamers en complete verbouwingen.</p><span class="link-line">Wat we doen</span></div>
   </a>
-</section>
+</section>` : v === 'c' ? html`<section class="vak" data-vak>
+  <div class="vak__beeld" aria-hidden="true">
+    ${SERVICES.map((d, i) => html`<img src="${d.img}" alt="" loading="lazy"${i ? '' : raw(' class="is-on"')}>`)}
+    <span class="vak__tel"><b data-vak-nr>01</b> / 0${SERVICES.length}</span>
+  </div>
+  <div class="vak__lijst">
+    <p class="eyebrow reveal">Alles onder één dak</p>
+    <ol>
+      ${SERVICES.map((d, i) => html`<li${i ? '' : raw(' class="is-on"')} tabindex="0" data-vak-rij="${i}"><span>0${i + 1}</span><div><h3>${d.name}</h3><p>${d.desc}</p></div></li>`)}
+    </ol>
+    <a class="link-line" href="/afspraak">Bekijk het in de showroom</a>
+  </div>
+</section>` : ''}
 
 ${reelsBlock()}
 

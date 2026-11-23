@@ -16,7 +16,10 @@ export function cartCount(req) {
   return one('SELECT COUNT(*) n FROM cart_items ci JOIN products p ON p.id = ci.product_id AND p.visible = 1 WHERE ci.session_id = ?', req.session.id).n;
 }
 
-export function layout(req, { title, description, body, hero = false, bodyClass = '', image, jsonld }) {
+// De keuzebalk staat alleen op de demo en lokaal, nooit op de echte site.
+const DEMO = Boolean(process.env.KIJKVERSIE || process.env.VERSIES) || process.env.NODE_ENV !== 'production';
+
+export function layout(req, { title, description, body, hero = false, bodyClass = '', image, jsonld, versies }) {
   const cats = shopCategories();
   const subs = all(`SELECT DISTINCT c.slug, c.name FROM categories c WHERE c.parent_id IS NOT NULL AND EXISTS (SELECT 1 FROM product_categories pc WHERE pc.category_id = c.id) GROUP BY c.name ORDER BY c.name`);
   const count = cartCount(req);
@@ -55,7 +58,7 @@ ${jsonld ? raw('<script type="application/ld+json">' + JSON.stringify(jsonld).re
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=18">
+<link rel="stylesheet" href="/styles.css?v=20">
 </head>
 <body class="${hero ? 'has-hero' : 'no-hero'} ${bodyClass}">
 
@@ -129,6 +132,11 @@ ${msg ? html`<div class="toast is-on" role="status">${msg}</div>` : ''}
   </div>
 </footer>
 
+${versies && DEMO ? html`<nav class="versies" aria-label="Versie kiezen">
+  <span>${versies.onderdeel}</span>
+  ${Object.entries(versies.keuzes).map(([k, naam]) => html`<a href="?versie=${k}" title="${naam}"${k === versies.nu ? raw(' class="is-nu" aria-current="true"') : ''}><b>${k.toUpperCase()}</b><i>${naam}</i></a>`)}
+</nav>` : ''}
+
 <aside class="drawer" id="drawer" aria-hidden="true" aria-label="Winkelmand">
   <div class="drawer__shade" data-cart-close></div>
   <div class="drawer__panel">
@@ -137,7 +145,7 @@ ${msg ? html`<div class="toast is-on" role="status">${msg}</div>` : ''}
   </div>
 </aside>
 
-<script src="/main.js?v=11" defer></script>
+<script src="/main.js?v=12" defer></script>
 </body>
 </html>`;
 }

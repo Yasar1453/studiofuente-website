@@ -44,6 +44,8 @@ h1 em { font-style: italic; color: #c9ac8b; }
 .regels div:first-child dt { color: #c9ac8b; }
 .stap b u { display: block; text-decoration: none; margin-top: 4px; color: #7d766b; text-align: right; }
 .vg__pdf { color: #c9ac8b; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(201, 172, 139, .45); padding-bottom: 3px; white-space: nowrap; }
+/* Rechtsonder zet Netlify op de kijkversie een eigen label; de voettekst blijft daar links van. */
+.vg__foot { padding-right: 250px; }
 .vg__pdf:hover { color: #f7f4ef; border-color: #f7f4ef; }
 .vg__fases { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(20px, 4vw, 64px); }
 .fase { border-top: 1px solid rgba(247, 244, 239, .22); padding-top: clamp(10px, 1.8vh, 20px); }
@@ -74,6 +76,9 @@ h1 em { font-style: italic; color: #c9ac8b; }
   .vg__top, .vg__foot, .vg__eyebrow, .fase__nr { font-size: 10.5px; letter-spacing: .14em; }
   .vg__foot em, .vg__top em, .vg__balk, .regels { display: none; }
   .vg__kop { display: block; }
+  .vg__foot { padding-right: 0; justify-content: flex-start; }
+  .vg__foot > span:first-child { display: none; }
+  .vg__pdf { letter-spacing: .08em; }
   .vg { padding-top: clamp(12px, 2.4vh, 28px); padding-bottom: clamp(12px, 2.4vh, 28px); gap: clamp(8px, 2vh, 24px); }
   .vg__main { gap: clamp(10px, 2.6vh, 30px); }
   h1 { font-size: clamp(27px, min(9vw, 6.4vh), 52px); }

@@ -44,8 +44,6 @@ h1 em { font-style: italic; color: #c9ac8b; }
 .regels div:first-child dt { color: #c9ac8b; }
 .stap b u { display: block; text-decoration: none; margin-top: 4px; color: #7d766b; text-align: right; }
 .vg__pdf { color: #c9ac8b; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(201, 172, 139, .45); padding-bottom: 3px; white-space: nowrap; }
-/* Rechtsonder zet Netlify op de kijkversie een eigen label; de voettekst blijft daar links van. */
-.vg__foot { padding-right: 250px; }
 .vg__pdf:hover { color: #f7f4ef; border-color: #f7f4ef; }
 .vg__fases { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(20px, 4vw, 64px); }
 .fase { border-top: 1px solid rgba(247, 244, 239, .22); padding-top: clamp(10px, 1.8vh, 20px); }

@@ -12,6 +12,7 @@ import * as S from './views/shop.js';
 import * as A from './views/account.js';
 import * as B from './views/admin.js';
 import { shopCategories, SITE } from './views/layout.js';
+import { voortgang } from './views/voortgang.js';
 import { paymentsEnabled } from './payments.js';
 import * as PL from './planning.js';
 import { normSlug, importAll } from './import.js';
@@ -92,6 +93,7 @@ app.post('/contact', (req, res) => {
 app.get('/showroom', (req, res) => send(res, P.showroom(req)));
 app.get('/projecten', (req, res) => send(res, P.projecten(req)));
 app.get('/over-fuente', (req, res) => send(res, P.overFuente(req)));
+app.get('/voortgang', (req, res) => send(res, voortgang()));
 app.get('/journaal', (req, res) => send(res, P.journaal(req)));
 app.get('/journaal/:slug', (req, res) => {
   const a = P.ARTICLES.find(x => x.slug === req.params.slug);

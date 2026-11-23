@@ -833,6 +833,7 @@ h1 em, h2 em, h3 em { color: var(--bronze); }
 .nav__links { justify-content: flex-end; }
 
 /* ---------- Banner met video's ---------- */
+.hero__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; background: #121110; }
 .hero__panels { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(4, 1fr); }
 .hero__panel { position: relative; margin: 0; overflow: hidden; background: #1b1916; }
 .hero__panel + .hero__panel { border-left: 1px solid rgba(255, 255, 255, .16); }
@@ -886,3 +887,6 @@ h1 em, h2 em, h3 em { color: var(--bronze); }
   .plan__opts--2, .plan__opts--3 { grid-template-columns: 1fr; }
   .plan__step legend { font-size: 24px; }
 }
+
+/* Smalle telefoons: de twee bannerlinks staan onder elkaar, de titel schuift mee omhoog. */
+@media (max-width: 479px) { .hero__content { bottom: 250px; } }

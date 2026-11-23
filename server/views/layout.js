@@ -55,7 +55,7 @@ ${jsonld ? raw('<script type="application/ld+json">' + JSON.stringify(jsonld).re
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css?v=17">
+<link rel="stylesheet" href="/styles.css?v=18">
 </head>
 <body class="${hero ? 'has-hero' : 'no-hero'} ${bodyClass}">
 
@@ -83,6 +83,7 @@ ${jsonld ? raw('<script type="application/ld+json">' + JSON.stringify(jsonld).re
     <div class="nav__item"><a href="/projecten">Projecten</a></div>
     <div class="nav__item"><a href="/showroom">Showroom</a></div>
     <div class="nav__item"><a href="/over-fuente">Over Fuente</a></div>
+    <div class="nav__item"><a href="/contact">Contact</a></div>
   </nav>
   <div class="nav__tools">
     <a class="nav__cta" href="/afspraak">Afspraak maken</a>
@@ -94,6 +95,7 @@ ${jsonld ? raw('<script type="application/ld+json">' + JSON.stringify(jsonld).re
   <a href="/projecten">Projecten</a>
   <a href="/showroom">Showroom</a>
   <a href="/over-fuente">Over Fuente</a>
+  <a href="/contact">Contact</a>
   <a href="/afspraak" class="menu__cta">Afspraak maken</a>
   <p class="menu__meta">Sierenborch 4, Amsterdam<br><a href="tel:+31203033499">020 303 3499</a></p>
 </div>

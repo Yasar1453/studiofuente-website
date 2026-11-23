@@ -87,13 +87,6 @@ export const reviewsBlock = () => html`
 </section>`;
 
 // Banner: vier staande video's naast elkaar die laten zien wat Studio Fuente doet.
-const HERO = [
-  { src: '/assets/web/clips/villa-45', label: 'Complete woningen' },
-  { src: '/assets/web/hero-kast', label: 'Kasten op maat' },
-  { src: '/assets/web/clips/marmer-45', label: 'Maatwerk in marmer' },
-  { src: '/assets/web/reels/1878561399429307', label: 'Materialen en decors' },
-];
-
 export function home(req, featured) {
   return layout(req, {
     hero: true,
@@ -103,12 +96,7 @@ export function home(req, featured) {
     body: html`
 <section class="hero">
   <div class="hero__media"><img src="/assets/web/hero.webp" alt="De showroom van Studio Fuente met marmeren tegelpanelen en bloesem" width="2048" height="1365"></div>
-  <div class="hero__panels" data-hero-panels>
-    ${HERO.map((h, i) => html`<figure class="hero__panel${i ? '' : ' is-on'}">
-      <video src="${h.src}.mp4" poster="${h.src}.jpg" muted loop playsinline preload="none" data-ambient aria-label="${h.label}"></video>
-      <figcaption><span>0${i + 1}</span>${h.label}</figcaption>
-    </figure>`)}
-  </div>
+  <video class="hero__video" src="/assets/web/hero-showroom.mp4" poster="/assets/web/hero-showroom.jpg" muted loop playsinline autoplay preload="metadata" data-ambient aria-label="De materialenwand in de showroom van Studio Fuente"></video>
   <div class="hero__shade"></div>
   <div class="hero__content">
     <h1 class="hero__title">Het complete interieur.<br><em>Onder één dak.</em></h1>

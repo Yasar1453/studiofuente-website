@@ -892,7 +892,8 @@ h1 em, h2 em, h3 em { color: var(--bronze); }
 @media (max-width: 479px) { .hero__content { bottom: 250px; } }
 
 /* Banner zonder tekst: alleen de video, met een lichte schaduw zodat het menu leesbaar blijft. */
-.hero--b .hero__shade { background: linear-gradient(180deg, rgba(14,12,10,.55) 0%, rgba(14,12,10,0) 24%, rgba(14,12,10,0) 78%, rgba(14,12,10,.35) 100%); }
+.hero--b .hero__shade { background: linear-gradient(180deg, rgba(14,12,10,.55) 0%, rgba(14,12,10,0) 24%, rgba(14,12,10,0) 62%, rgba(14,12,10,.7) 100%); }
+.hero--c .hero__shade { background: linear-gradient(180deg, rgba(14,12,10,.55) 0%, rgba(14,12,10,0) 24%, rgba(14,12,10,0) 78%, rgba(14,12,10,.35) 100%); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* Keuzebalk op de demo: wissel tussen versies van een onderdeel. Staat aan de rechterrand, daar staat geen inhoud. */
@@ -906,8 +907,6 @@ h1 em, h2 em, h3 em { color: var(--bronze); }
 .versies a.is-nu { background: #c9ac8b; color: #181613; }
 @media (max-width: 760px) { .versies { right: 8px; } .versies a { width: 30px; height: 30px; } }
 
-/* Banner B: alleen de twee links onderaan, zonder lijn en tekst. */
-.hero__foot--kaal { border-top: 0; justify-content: flex-end; }
 
 /* Versie C: vakkenlijst. Links een staand beeld dat wisselt, rechts de vakken in grote letters. */
 .vak { display: grid; grid-template-columns: minmax(0, .82fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 110px); align-items: start; max-width: 1560px; margin: 0 auto; padding: clamp(90px, 10vw, 150px) var(--gutter); }
@@ -933,3 +932,43 @@ h1 em, h2 em, h3 em { color: var(--bronze); }
 }
 @media (max-width: 760px) { .versies { top: 36%; } }
 @media (prefers-reduced-motion: reduce) { .vak__beeld img, .vak li, .vak li p { transition: none; } }
+/* Kleinste telefoons: de keuzebalk ligt plat onder het menu, zodat hij de titel niet raakt. */
+@media (max-width: 340px) {
+  .versies { flex-direction: row; top: 78px; transform: none; padding: 4px 4px 4px 12px; }
+  .versies span { writing-mode: horizontal-tb; transform: none; margin: 0 6px 0 0; }
+}
+
+/* Kop met Instagram-icoon boven het videoblok. */
+.eyebrow--icoon { display: flex; align-items: center; gap: 10px; }
+.eyebrow__icoon { flex: none; }
+
+/* Recensies, vorm B: één groot citaat dat wisselt. */
+.rv-citaat { background: var(--paper); padding: clamp(100px, 12vw, 170px) 0; text-align: center; }
+.rv-citaat .eyebrow { margin-bottom: clamp(28px, 4vw, 50px); }
+.rv-citaat__stapel { display: grid; max-width: 1040px; margin: 0 auto; }
+.rv-citaat blockquote { grid-area: 1 / 1; margin: 0; opacity: 0; transform: translateY(14px); transition: opacity .8s var(--ease), transform .9s var(--ease); pointer-events: none; }
+.rv-citaat blockquote.is-on { opacity: 1; transform: none; pointer-events: auto; }
+.rv-citaat blockquote p { margin: 0; font: 300 clamp(26px, 3.3vw, 50px)/1.22 var(--serif); letter-spacing: -.005em; color: var(--ink); }
+.rv-citaat blockquote p::before { content: "\201C"; } .rv-citaat blockquote p::after { content: "\201D"; }
+.rv-citaat cite { display: block; margin-top: clamp(22px, 3vw, 38px); font-style: normal; font-size: 12px; letter-spacing: .26em; text-transform: uppercase; color: var(--bronze); }
+.rv-citaat__nav { display: flex; justify-content: center; gap: 4px; margin-top: clamp(30px, 4vw, 52px); }
+.rv-citaat__nav button { width: 44px; height: 30px; padding: 0; border: 0; background: none; cursor: pointer; position: relative; }
+.rv-citaat__nav button::after { content: ""; position: absolute; left: 6px; right: 6px; top: 50%; height: 1px; background: var(--line); transition: background .3s, height .3s; }
+.rv-citaat__nav button.is-on::after { background: var(--ink); height: 2px; }
+
+/* Recensies, vorm C: een wand in kolommen. */
+.rv-wand { background: var(--bone); padding: clamp(100px, 12vw, 160px) 0; }
+.rv-wand__kop { margin-bottom: clamp(40px, 5vw, 70px); }
+.rv-wand__kolommen { columns: 3; column-gap: clamp(16px, 2vw, 28px); }
+.rv-wand blockquote { break-inside: avoid; margin: 0 0 clamp(16px, 2vw, 28px); padding: clamp(24px, 2.4vw, 36px); background: var(--white); border: 1px solid var(--line); }
+.rv-wand blockquote p { margin: 0 0 22px; font: 400 clamp(19px, 1.5vw, 23px)/1.35 var(--serif); color: var(--ink); }
+.rv-wand blockquote.is-groot { background: var(--ink-2); border-color: var(--ink-2); }
+.rv-wand blockquote.is-groot p { color: var(--paper); font-size: clamp(24px, 2.1vw, 32px); font-weight: 300; line-height: 1.25; }
+.rv-wand footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; }
+.rv-wand cite { font-style: normal; color: var(--ink); }
+.rv-wand footer span { color: var(--stone); }
+.rv-wand blockquote.is-groot footer { border-top-color: rgba(247, 244, 239, .18); }
+.rv-wand blockquote.is-groot cite { color: var(--sand); } .rv-wand blockquote.is-groot footer span { color: rgba(247, 244, 239, .5); }
+@media (max-width: 980px) { .rv-wand__kolommen { columns: 2; } }
+@media (max-width: 620px) { .rv-wand__kolommen { columns: 1; } }
+@media (prefers-reduced-motion: reduce) { .rv-citaat blockquote { transition: none; } }

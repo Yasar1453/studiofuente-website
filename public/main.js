@@ -380,3 +380,14 @@
     ['mouseenter', 'focus', 'click'].forEach(function (ev) { r.addEventListener(ev, function () { kies(i); }); });
   });
 })();
+
+/* Recensies als één groot citaat (versie B): wisselt vanzelf, of met de streepjes eronder. */
+(function () {
+  var box = document.querySelector('[data-citaat]');
+  if (!box) return;
+  var q = box.querySelectorAll('blockquote'), k = box.querySelectorAll('.rv-citaat__nav button'), i = 0, t;
+  function toon(n) { i = (n + q.length) % q.length; q.forEach(function (e, j) { e.classList.toggle('is-on', j === i); }); k.forEach(function (e, j) { e.classList.toggle('is-on', j === i); }); }
+  function loop() { clearInterval(t); if (!matchMedia('(prefers-reduced-motion: reduce)').matches) t = setInterval(function () { if (!document.hidden) toon(i + 1); }, 6500); }
+  k.forEach(function (e, j) { e.addEventListener('click', function () { toon(j); loop(); }); });
+  loop();
+})();

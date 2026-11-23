@@ -41,11 +41,12 @@ const STEPS = [
   ['Oplevering', 'Na jouw akkoord nemen wij de uitvoering over. Zorgvuldig gepland, netjes afgewerkt.'],
 ];
 
-const reelsBlock = (eyebrow = 'Recent werk', title = 'Van showroom\n*tot villa*') => html`
+const INSTA = raw('<svg class="eyebrow__icoon" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"/></svg>');
+const reelsBlock = (eyebrow = 'Onze Instagram video\'s', title = 'Van showroom\n*tot villa*') => html`
 <section class="werk" id="werk">
   <div class="wrap section-head section-head--row">
     <div>
-      <p class="eyebrow reveal">${eyebrow}</p>
+      <p class="eyebrow eyebrow--icoon reveal">${INSTA}${eyebrow}</p>
       <h2 class="reveal">${em(title)}</h2>
     </div>
     <div class="werk__tools reveal">
@@ -68,7 +69,7 @@ const reelsBlock = (eyebrow = 'Recent werk', title = 'Van showroom\n*tot villa*'
   </div>
 </section>`;
 
-export const reviewsBlock = () => html`
+const reviewsBand = () => html`
 <section class="reviews" aria-label="Wat klanten zeggen">
   <div class="wrap reviews__head">
     <p class="eyebrow reveal">Google recensies</p>
@@ -86,16 +87,41 @@ export const reviewsBlock = () => html`
   </div>
 </section>`;
 
-// Banner in drie versies, te kiezen met de balk op de demo (zie layout: versies).
-// A: één grote video met tekst, daaronder Producten en Diensten. B: alleen de video met twee links, geen blok eronder.
-// C: vier staande video's met tekst alleen onderaan, daaronder de vakkenlijst met wisselend beeld.
-const HERO = [
-  { src: '/assets/web/clips/villa-45', label: 'Complete woningen' },
-  { src: '/assets/web/hero-kast', label: 'Kasten op maat' },
-  { src: '/assets/web/clips/marmer-45', label: 'Maatwerk in marmer' },
-  { src: '/assets/web/reels/1878561399429307', label: 'Materialen en decors' },
-];
-const BANNERS = { a: 'Video met tekst', b: 'Alleen video', c: 'Vier video\'s en vakkenlijst' };
+// Eén groot citaat tegelijk, dat rustig wisselt.
+const reviewsCitaat = () => html`
+<section class="rv-citaat" aria-label="Wat klanten zeggen" data-citaat>
+  <div class="wrap">
+    <p class="eyebrow reveal">Google recensies</p>
+    <div class="rv-citaat__stapel">
+      ${REVIEWS.filter(r => r.text.length > 40).map((r, i) => html`<blockquote${i ? '' : raw(' class="is-on"')}><p>${r.text}</p><footer><cite>${r.name}</cite></footer></blockquote>`)}
+    </div>
+    <div class="rv-citaat__nav">
+      ${REVIEWS.filter(r => r.text.length > 40).map((r, i) => html`<button type="button" aria-label="Recensie ${i + 1}"${i ? '' : raw(' class="is-on"')}></button>`)}
+    </div>
+  </div>
+</section>`;
+
+// Een wand van recensies: alles tegelijk in beeld, in kolommen van ongelijke hoogte.
+const reviewsWand = () => html`
+<section class="rv-wand" aria-label="Wat klanten zeggen">
+  <div class="wrap">
+    <div class="rv-wand__kop">
+      <p class="eyebrow reveal">Google recensies</p>
+      <h2 class="reveal">${em('In hun *eigen woorden*')}</h2>
+    </div>
+    <div class="rv-wand__kolommen">
+      ${REVIEWS.map((r, i) => html`<blockquote class="reveal${i === 0 ? ' is-groot' : ''}"><p>${r.text}</p><footer><cite>${r.name}</cite><span>Google</span></footer></blockquote>`)}
+    </div>
+  </div>
+</section>`;
+
+export const reviewsBlock = (vorm = 'a') => vorm === 'b' ? reviewsCitaat() : vorm === 'c' ? reviewsWand() : reviewsBand();
+
+// De homepage in drie versies, te kiezen met de balk op de demo (zie layout: versies). Het videoblok is overal gelijk.
+// A: video met titel en tekst, blok Producten en Diensten, recensies als schuivende band.
+// B: video met alleen de regel onderaan, geen blok eronder, één groot citaat dat wisselt.
+// C: alleen de video, daaronder de vakkenlijst, recensies als wand.
+const BANNERS = { a: 'Video met titel', b: 'Video met regel onderaan', c: 'Alleen video' };
 
 export function home(req, featured) {
   const v = BANNERS[req.versie] ? req.versie : 'a';
@@ -108,23 +134,18 @@ export function home(req, featured) {
     body: html`
 <section class="hero hero--${v}">
   <div class="hero__media"><img src="/assets/web/hero.webp" alt="De showroom van Studio Fuente met marmeren tegelpanelen en bloesem" width="2048" height="1365"></div>
-${v === 'c' ? html`  <div class="hero__panels" data-hero-panels>
-    ${HERO.map((h, i) => html`<figure class="hero__panel${i ? '' : ' is-on'}">
-      <video src="${h.src}.mp4" poster="${h.src}.jpg" muted loop playsinline preload="none" data-ambient aria-label="${h.label}"></video>
-      <figcaption><span>0${i + 1}</span>${h.label}</figcaption>
-    </figure>`)}
-  </div>` : html`  <video class="hero__video" src="/assets/web/hero-showroom.mp4" poster="/assets/web/hero-showroom.jpg" muted loop playsinline autoplay preload="metadata" data-ambient aria-label="De materialenwand in de showroom van Studio Fuente"></video>`}
+  <video class="hero__video" src="/assets/web/hero-showroom.mp4" poster="/assets/web/hero-showroom.jpg" muted loop playsinline autoplay preload="metadata" data-ambient aria-label="De materialenwand in de showroom van Studio Fuente"></video>
   <div class="hero__shade"></div>
 ${v === 'a' ? html`  <div class="hero__content">
     <h1 class="hero__title">Het complete interieur.<br><em>Onder één dak.</em></h1>
   </div>` : html`  <h1 class="sr-only">Studio Fuente, het complete interieur onder één dak</h1>`}
-  <div class="hero__foot${v === 'b' ? ' hero__foot--kaal' : ''}">
-    ${v === 'b' ? '' : html`<p>Tegels, sanitair, maatwerk en vloeren.<br>Gekozen met aandacht, geplaatst met zorg.</p>`}
-    <div class="hero__links">
+${v === 'c' ? '' : html`  <div class="hero__foot">
+    <p>Tegels, sanitair, maatwerk en vloeren.<br>Gekozen met aandacht, geplaatst met zorg.</p>
+    ${v === 'a' ? html`<div class="hero__links">
       <a class="link-line link-line--light" href="/producten">Bekijk de collectie</a>
       <a class="link-line link-line--light" href="/afspraak">Plan een bezoek</a>
-    </div>
-  </div>
+    </div>` : ''}
+  </div>`}
 </section>
 
 ${v === 'a' ? html`<section class="duo">
@@ -152,7 +173,7 @@ ${v === 'a' ? html`<section class="duo">
 
 ${reelsBlock()}
 
-${reviewsBlock()}
+${reviewsBlock(v)}
 
 <section class="visit">
   <img src="/assets/web/lib/showroom-overzicht.webp" alt="" loading="lazy">

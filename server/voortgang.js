@@ -20,7 +20,7 @@ export const FASES = [
   {
     naam: 'Website',
     stappen: [
-      { naam: 'Homepage', status: 'bezig' },
+      { naam: 'Homepage', sub: 'Drie versies om te vergelijken: A, B en C. Kies met de balk rechts op de homepage.', status: 'bezig' },
       { naam: "Overige pagina's", sub: 'Projecten, Showroom, Over Fuente en Contact', status: 'volgt' },
       { naam: 'Afspraakplanner en vindbaarheid', status: 'volgt' },
       { naam: 'Website live', status: 'volgt' },

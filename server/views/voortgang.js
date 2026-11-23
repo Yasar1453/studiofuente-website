@@ -1,5 +1,5 @@
 import { html } from '../lib.js';
-import { FASES, BIJGEWERKT } from '../voortgang.js';
+import { FASES, BIJGEWERKT, AFSPRAKEN, PDF } from '../voortgang.js';
 
 const LABEL = { klaar: 'Afgerond', bezig: 'Nu bezig', akkoord: 'Wacht op akkoord', volgt: '' };
 
@@ -37,6 +37,14 @@ body { background: #181613; color: #f7f4ef; font: 300 16px/1.5 "Jost", "Helvetic
 h1 { margin: 0; font: 300 clamp(34px, min(6.2vw, 9.5vh), 92px)/1.02 "Cormorant", "Times New Roman", serif; letter-spacing: -.01em; }
 h1 em { font-style: italic; color: #c9ac8b; }
 .vg__lead { margin: clamp(8px, 1.6vh, 18px) 0 0; max-width: 52ch; color: #cfc8bc; font-size: clamp(14px, 1.9vh, 17px); }
+.vg__kop { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(20px, 4vw, 64px); align-items: end; }
+.regels dl { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: clamp(6px, 1.4vh, 16px) clamp(16px, 2vw, 32px); }
+.regels dt { color: #f7f4ef; font-size: clamp(13.5px, 1.9vh, 16px); font-weight: 400; }
+.regels dd { margin: 0; color: #a39b8f; font-size: clamp(12px, 1.6vh, 13.5px); line-height: 1.35; }
+.regels div:first-child dt { color: #c9ac8b; }
+.stap b u { display: block; text-decoration: none; margin-top: 4px; color: #7d766b; text-align: right; }
+.vg__pdf { color: #c9ac8b; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(201, 172, 139, .45); padding-bottom: 3px; white-space: nowrap; }
+.vg__pdf:hover { color: #f7f4ef; border-color: #f7f4ef; }
 .vg__fases { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(20px, 4vw, 64px); }
 .fase { border-top: 1px solid rgba(247, 244, 239, .22); padding-top: clamp(10px, 1.8vh, 20px); }
 .fase.is-nu { border-top-color: #c9ac8b; }
@@ -58,12 +66,14 @@ h1 em { font-style: italic; color: #c9ac8b; }
 .vg__balk span { position: absolute; inset: 0 auto 0 0; background: #c9ac8b; height: 1px; }
 @keyframes puls { 70% { box-shadow: 0 0 0 9px rgba(201, 172, 139, 0); } 100% { box-shadow: 0 0 0 0 rgba(201, 172, 139, 0); } }
 @media (prefers-reduced-motion: reduce) { .stap i { animation: none !important; } }
+@media (max-height: 660px) and (min-width: 821px) { .stap small { display: none; } }
 @media (max-width: 820px) {
   .vg__fases { grid-template-columns: 1fr; gap: clamp(12px, 2.4vh, 24px); }
   .vg__lead { display: none; }
   .stap small { display: none; }
   .vg__top, .vg__foot, .vg__eyebrow, .fase__nr { font-size: 10.5px; letter-spacing: .14em; }
-  .vg__foot em, .vg__top em, .vg__balk, .vg__foot span:last-child { display: none; }
+  .vg__foot em, .vg__top em, .vg__balk, .regels { display: none; }
+  .vg__kop { display: block; }
   .vg { padding-top: clamp(12px, 2.4vh, 28px); padding-bottom: clamp(12px, 2.4vh, 28px); gap: clamp(8px, 2vh, 24px); }
   .vg__main { gap: clamp(10px, 2.6vh, 30px); }
   h1 { font-size: clamp(27px, min(9vw, 6.4vh), 52px); }
@@ -82,16 +92,21 @@ h1 em { font-style: italic; color: #c9ac8b; }
     <span style="white-space:nowrap"><em style="font-style:normal">Bijgewerkt </em>${BIJGEWERKT}</span>
   </header>
   <main class="vg__main">
-    <div>
+    <div class="vg__kop">
+     <div>
       <p class="vg__eyebrow">Voortgang${nu ? html` · fase ${faseNu + 1} van ${FASES.length}` : ''}</p>
       <h1>${kop}</h1>
-      <p class="vg__lead">Elke stap ronden we af met jullie akkoord. Pas daarna gaan we door naar de volgende.</p>
+     </div>
+     <aside class="regels">
+      <p class="vg__eyebrow">Afspraken</p>
+      <dl>${AFSPRAKEN.map(a => html`<div><dt>${a.kop}</dt><dd>${a.tekst}</dd></div>`)}</dl>
+     </aside>
     </div>
     <div class="vg__fases">
       ${FASES.map((f, i) => html`<section class="fase${i === faseNu ? ' is-nu' : ''}">
         <div class="fase__kop"><span class="fase__nr">Fase ${i + 1}</span><h2>${f.naam}</h2></div>
         <ol>
-          ${f.stappen.map(s => html`<li class="stap stap--${s.status}"><i></i><span>${s.naam}${s.sub ? html`<small>${s.sub}</small>` : ''}</span><b>${LABEL[s.status] || ''}</b></li>`)}
+          ${f.stappen.map(s => html`<li class="stap stap--${s.status}"><i></i><span>${s.naam}${s.sub ? html`<small>${s.sub}</small>` : ''}</span><b>${s.akkoord ? html`Akkoord ${s.akkoord.door}<u>${s.akkoord.datum}</u>` : LABEL[s.status] || ''}</b></li>`)}
         </ol>
         ${f.mijlpaal ? html`<p class="mijlpaal">${f.mijlpaal}</p>` : ''}
       </section>`)}
@@ -100,7 +115,7 @@ h1 em { font-style: italic; color: #c9ac8b; }
   <footer class="vg__foot">
     <span>${klaar} van ${alle.length} stappen afgerond</span>
     <div class="vg__balk"><span style="width:${Math.round(klaar / alle.length * 100)}%"></span></div>
-    <span><em style="font-style:normal">Doorgaan </em>alleen na akkoord</span>
+    <a class="vg__pdf" href="${PDF}" download>Afspraken <em style="font-style:normal">downloaden </em>(pdf) <svg viewBox="0 0 12 12" width="11" height="11" aria-hidden="true"><path d="M6 1v8M2.5 6 6 9.5 9.5 6M1.5 11h9" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></a>
   </footer>
 </div>
 </body>
